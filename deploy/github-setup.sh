@@ -114,9 +114,14 @@ ok "Certbot installed"
 # ── 10. Git clone ────────────────────────────────────────
 info "Cloning app from GitHub..."
 apt install -y -qq git
-mkdir -p "${APP_DIR}"
-git clone "${GITHUB_REPO}" "${APP_DIR}"
-ok "App cloned to ${APP_DIR}"
+if [ -d "${APP_DIR}/.git" ]; then
+    info "Directory exists — pulling latest code..."
+    git -C "${APP_DIR}" pull origin master
+else
+    mkdir -p "${APP_DIR}"
+    git clone "${GITHUB_REPO}" "${APP_DIR}"
+fi
+ok "App ready at ${APP_DIR}"
 
 # ── 11. App permissions ──────────────────────────────────
 chown -R www-data:www-data "${APP_DIR}"
