@@ -8,6 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('credit_installments')) {
+            return;
+        }
         Schema::create('credit_installments', function (Blueprint $table) {
             $table->id();
             $table->string('reference')->nullable();
@@ -19,7 +22,7 @@ return new class extends Migration
             $table->decimal('paid_amount', 22, 4)->default(0);
             $table->date('due_date');
             $table->date('paid_date')->nullable();
-            $table->string('status', 20)->default('pending'); // pending, paid, overdue
+            $table->string('status', 20)->default('pending');
             $table->text('notes')->nullable();
             $table->json('extra_attributes')->nullable();
             $table->string('hash')->nullable();

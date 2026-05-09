@@ -6,27 +6,26 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->bigInteger('user_id')->unsigned()->nullable()->change();
             $table->bigInteger('customer_id')->unsigned()->nullable()->change();
             $table->bigInteger('register_id')->unsigned()->nullable()->change();
-            $table->string('source', 10)->default('pos')->after('number');
-            $table->string('customer_name')->nullable()->after('customer_id');
-            $table->string('status', 20)->nullable()->after('data');
-
-            $table->index('source');
-            $table->index('status');
+            if (!Schema::hasColumn('orders', 'source')) {
+                $table->string('source', 10)->default('pos')->after('number');
+                $table->index('source');
+            }
+            if (!Schema::hasColumn('orders', 'customer_name')) {
+                $table->string('customer_name')->nullable()->after('customer_id');
+            }
+            if (!Schema::hasColumn('orders', 'status')) {
+                $table->string('status', 20)->nullable()->after('data');
+                $table->index('status');
+            }
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {

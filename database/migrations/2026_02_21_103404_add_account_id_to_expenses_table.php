@@ -7,19 +7,16 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
+        if (Schema::hasColumn('expenses', 'account_id')) {
+            return;
+        }
         Schema::table('expenses', function (Blueprint $table) {
             $table->foreignIdFor(Account::class)->nullable()->after('register_id')->constrained();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('expenses', function (Blueprint $table) {

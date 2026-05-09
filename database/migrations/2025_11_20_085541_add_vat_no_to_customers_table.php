@@ -6,19 +6,16 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
+        if (Schema::hasColumn('customers', 'vat_no')) {
+            return;
+        }
         Schema::table('customers', function (Blueprint $table) {
             $table->string('vat_no')->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('customers', function (Blueprint $table) {

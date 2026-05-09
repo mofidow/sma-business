@@ -6,47 +6,23 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
-            $table->string('telegram_user_id')->nullable();
-        });
-
-        Schema::table('suppliers', function (Blueprint $table) {
-            $table->string('telegram_user_id')->nullable();
-        });
-
-        Schema::table('stores', function (Blueprint $table) {
-            $table->string('telegram_user_id')->nullable();
-        });
-
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('telegram_user_id')->nullable();
-        });
+        foreach (['customers', 'suppliers', 'stores', 'users'] as $t) {
+            if (!Schema::hasColumn($t, 'telegram_user_id')) {
+                Schema::table($t, function (Blueprint $table) {
+                    $table->string('telegram_user_id')->nullable();
+                });
+            }
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
-            $table->dropColumn('telegram_user_id');
-        });
-
-        Schema::table('suppliers', function (Blueprint $table) {
-            $table->dropColumn('telegram_user_id');
-        });
-
-        Schema::table('stores', function (Blueprint $table) {
-            $table->dropColumn('telegram_user_id');
-        });
-
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('telegram_user_id');
-        });
+        foreach (['customers', 'suppliers', 'stores', 'users'] as $t) {
+            Schema::table($t, function (Blueprint $table) {
+                $table->dropColumn('telegram_user_id');
+            });
+        }
     }
 };

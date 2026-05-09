@@ -6,12 +6,11 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        // Create technicians table first
+        if (Schema::hasTable('technicians')) {
+            return;
+        }
         Schema::create('technicians', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -26,9 +25,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('technicians');

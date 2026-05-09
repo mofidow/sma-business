@@ -6,11 +6,11 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
+        if (Schema::hasTable('repair_orders')) {
+            return;
+        }
         Schema::create('repair_orders', function (Blueprint $table) {
             $table->id();
             $table->string('reference')->unique();
@@ -21,7 +21,6 @@ return new class extends Migration
             $table->foreignId('store_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
 
-            // Service details
             $table->string('serial_no')->nullable()->index();
             $table->text('problem_description');
             $table->string('device_password')->nullable();
@@ -29,19 +28,16 @@ return new class extends Migration
             $table->enum('device_condition', ['excellent', 'good', 'fair', 'poor'])->default('good');
             $table->schemalessAttributes('extra_attributes');
 
-            // Assignment & costs
             $table->text('technician_comment')->nullable();
             $table->decimal('price', 15, 4)->default(0);
             $table->decimal('actual_cost', 15, 4)->default(0)->nullable();
 
-            // Dates & status
             $table->date('received_date');
             $table->date('due_date')->nullable();
             $table->date('completed_date')->nullable();
             $table->enum('status', ['pending', 'in_progress', 'waiting_parts', 'completed', 'delivered', 'cancelled'])->default('pending');
             $table->enum('priority', ['low', 'normal', 'high', 'urgent'])->default('normal');
 
-            // Invoice & notes
             $table->foreignId('invoice_id')->nullable()->constrained('sales')->nullOnDelete();
             $table->text('internal_notes')->nullable();
             $table->text('customer_notes')->nullable();
@@ -51,9 +47,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('repair_orders');

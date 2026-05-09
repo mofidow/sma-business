@@ -6,21 +6,21 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('gift_cards', function (Blueprint $table) {
-            $table->string('details')->nullable();
-            $table->boolean('use_award_points')->nullable();
-            $table->unsignedInteger('award_points')->nullable();
+            if (!Schema::hasColumn('gift_cards', 'details')) {
+                $table->string('details')->nullable();
+            }
+            if (!Schema::hasColumn('gift_cards', 'use_award_points')) {
+                $table->boolean('use_award_points')->nullable();
+            }
+            if (!Schema::hasColumn('gift_cards', 'award_points')) {
+                $table->unsignedInteger('award_points')->nullable();
+            }
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('gift_cards', function (Blueprint $table) {

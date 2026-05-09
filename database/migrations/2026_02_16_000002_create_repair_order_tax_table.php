@@ -6,11 +6,11 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
+        if (Schema::hasTable('repair_order_tax')) {
+            return;
+        }
         Schema::create('repair_order_tax', function (Blueprint $table) {
             $table->id();
             $table->foreignId('repair_order_id')->constrained()->cascadeOnDelete();
@@ -22,9 +22,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('repair_order_tax');

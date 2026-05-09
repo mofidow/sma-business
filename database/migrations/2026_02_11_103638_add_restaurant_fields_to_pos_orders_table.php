@@ -6,25 +6,28 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->foreignId('hall_id')->nullable()->after('customer_id')->constrained()->nullOnDelete();
-            $table->foreignId('table_id')->nullable()->after('hall_id')->constrained()->nullOnDelete();
-            $table->string('reference_number')->nullable()->after('reference');
-            $table->integer('guests')->nullable()->default(1)->after('reference_number');
-            $table->text('notes')->nullable()->after('guests');
-
-            $table->index('reference_number');
+            if (!Schema::hasColumn('orders', 'hall_id')) {
+                $table->foreignId('hall_id')->nullable()->after('customer_id')->constrained()->nullOnDelete();
+            }
+            if (!Schema::hasColumn('orders', 'table_id')) {
+                $table->foreignId('table_id')->nullable()->after('hall_id')->constrained()->nullOnDelete();
+            }
+            if (!Schema::hasColumn('orders', 'reference_number')) {
+                $table->string('reference_number')->nullable()->after('reference');
+                $table->index('reference_number');
+            }
+            if (!Schema::hasColumn('orders', 'guests')) {
+                $table->integer('guests')->nullable()->default(1)->after('reference_number');
+            }
+            if (!Schema::hasColumn('orders', 'notes')) {
+                $table->text('notes')->nullable()->after('guests');
+            }
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {

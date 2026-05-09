@@ -7,17 +7,16 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('sale_items', function (Blueprint $table) {
             $table->foreignId('product_id')->nullable()->change();
         });
 
-        Schema::table('sales', function (Blueprint $table) {
-            $table->foreignIdFor(RepairOrder::class)->nullable();
-        });
+        if (!Schema::hasColumn('sales', 'repair_order_id')) {
+            Schema::table('sales', function (Blueprint $table) {
+                $table->foreignIdFor(RepairOrder::class)->nullable();
+            });
+        }
     }
 };

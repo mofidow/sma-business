@@ -6,21 +6,21 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('quotations', function (Blueprint $table) {
-            $table->longText('signature')->nullable()->after('hash');
-            $table->string('signed_by_name')->nullable()->after('signature');
-            $table->timestamp('signed_at')->nullable()->after('signed_by_name');
+            if (!Schema::hasColumn('quotations', 'signature')) {
+                $table->longText('signature')->nullable()->after('hash');
+            }
+            if (!Schema::hasColumn('quotations', 'signed_by_name')) {
+                $table->string('signed_by_name')->nullable()->after('signature');
+            }
+            if (!Schema::hasColumn('quotations', 'signed_at')) {
+                $table->timestamp('signed_at')->nullable()->after('signed_by_name');
+            }
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('quotations', function (Blueprint $table) {

@@ -6,11 +6,11 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
+        if (Schema::hasTable('asset_maintenances')) {
+            return;
+        }
         Schema::create('asset_maintenances', function (Blueprint $table) {
             $table->id();
             $table->foreignId('asset_id')->constrained();
@@ -27,9 +27,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('asset_maintenances');

@@ -6,11 +6,11 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
+        if (Schema::hasTable('account_transfers')) {
+            return;
+        }
         Schema::create('account_transfers', function (Blueprint $table) {
             $table->id();
             $table->string('reference')->nullable();
@@ -24,9 +24,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('account_transfers');

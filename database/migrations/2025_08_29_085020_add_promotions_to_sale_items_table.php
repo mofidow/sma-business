@@ -6,19 +6,16 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
+        if (Schema::hasColumn('sale_items', 'promotions')) {
+            return;
+        }
         Schema::table('sale_items', function (Blueprint $table) {
             $table->json('promotions')->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('sale_items', function (Blueprint $table) {

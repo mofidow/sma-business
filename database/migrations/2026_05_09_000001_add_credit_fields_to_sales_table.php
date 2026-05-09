@@ -9,10 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sales', function (Blueprint $table) {
-            $table->boolean('is_credit')->default(false)->after('shop');
-            $table->string('credit_status', 20)->nullable()->after('is_credit'); // pending, partial, paid, overdue
-            $table->index('is_credit');
-            $table->index('credit_status');
+            if (!Schema::hasColumn('sales', 'is_credit')) {
+                $table->boolean('is_credit')->default(false)->after('shop');
+                $table->index('is_credit');
+            }
+            if (!Schema::hasColumn('sales', 'credit_status')) {
+                $table->string('credit_status', 20)->nullable()->after('is_credit');
+                $table->index('credit_status');
+            }
         });
     }
 
