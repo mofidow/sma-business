@@ -4,11 +4,34 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Creates the original SMA tables that existed before the 2025+ ALTER migrations.
+ * Every table uses Schema::hasTable() guards so re-runs are safe.
+ *
+ * Tables deliberately NOT created here (each has its own CREATE migration):
+ * promotion_store, halls, tables, recipes, technicians, service_types,
+ * repair_orders, repair_order_attachments, repair_order_tax,
+ * account_types, account_transfers, asset_categories, assets,
+ * asset_maintenances, asset_allocations, incomes, account_transactions,
+ * employees, leave_types, leaves, attendances, payrolls, payslips,
+ * payslip_items, claims, cost_allocations, credit_installments
+ *
+ * Columns deliberately NOT included (each is added by its own ALTER migration):
+ * hash (added 2025-10-29), vat_no (2025-11-20), telegram_user_id (2026-01-30),
+ * references/account_id/account_type_id (2026-01-29/02-21/02-20),
+ * hall_id/table_id/reference_number/guests/notes in sales (2026-02-11),
+ * type in products changed to enum (2026-02-11),
+ * signature/signed_by_name/signed_at in quotations (2026-04-09),
+ * return_payment_amount/return_payment_method in return_orders (2026-04-04),
+ * is_credit/credit_status in sales (2026-05-09),
+ * gift_card details/use_award_points/award_points (2026-01-12),
+ * gift_card_id in award_points (2026-01-12)
+ */
 return new class extends Migration
 {
     public function up(): void
     {
-        // ── Spatie Permissions ──────────────────────────────────────────
+        // ── Spatie Permissions ────────────────────────────────────────
         if (!Schema::hasTable('permissions')) {
             Schema::create('permissions', function (Blueprint $table) {
                 $table->bigIncrements('id');
@@ -62,10 +85,13 @@ return new class extends Migration
             });
         }
 
-        // ── Users ───────────────────────────────────────────────────────
+        // ── Core Laravel tables ───────────────────────────────────────
         if (!Schema::hasTable('users')) {
             Schema::create('users', function (Blueprint $table) {
                 $table->id();
+                $table->unsignedBigInteger('store_id')->nullable();
+                $table->unsignedBigInteger('customer_id')->nullable();
+                $table->unsignedBigInteger('supplier_id')->nullable();
                 $table->string('name');
                 $table->string('email')->unique();
                 $table->timestamp('email_verified_at')->nullable();
@@ -77,7 +103,6 @@ return new class extends Migration
                 $table->boolean('active')->default(1);
                 $table->json('bulk_actions')->nullable();
                 $table->boolean('can_be_impersonated')->nullable()->default(0);
-                $table->string('telegram_user_id')->nullable();
                 $table->string('two_factor_secret')->nullable();
                 $table->text('two_factor_recovery_codes')->nullable();
                 $table->string('profile_photo_path')->nullable();
@@ -133,7 +158,15 @@ return new class extends Migration
             });
         }
 
-        // ── Settings ────────────────────────────────────────────────────
+        if (!Schema::hasTable('password_reset_tokens')) {
+            Schema::create('password_reset_tokens', function (Blueprint $table) {
+                $table->string('email')->primary();
+                $table->string('token');
+                $table->timestamp('created_at')->nullable();
+            });
+        }
+
+        // ── Settings ──────────────────────────────────────────────────
         if (!Schema::hasTable('settings')) {
             Schema::create('settings', function (Blueprint $table) {
                 $table->string('tec_key')->primary();
@@ -142,7 +175,10 @@ return new class extends Migration
             });
         }
 
-        // ── Stores ──────────────────────────────────────────────────────
+        // ── Stores ────────────────────────────────────────────────────
+        // Note: vat_no added by 2025_11_20 migration
+        // Note: references added by 2026_01_29 migration
+        // Note: telegram_user_id added by 2026_01_30 migration
         if (!Schema::hasTable('stores')) {
             Schema::create('stores', function (Blueprint $table) {
                 $table->id();
@@ -153,25 +189,13 @@ return new class extends Migration
                 $table->string('email')->nullable();
                 $table->string('phone')->nullable();
                 $table->text('address')->nullable();
-                $table->string('vat_no')->nullable();
-                $table->string('telegram_user_id')->nullable();
                 $table->boolean('active')->default(1);
-                $table->json('references')->nullable();
                 $table->json('extra_attributes')->nullable();
                 $table->timestamps();
             });
         }
 
-        // Add store_id & customer_id to users after stores table created
-        if (Schema::hasTable('users') && !Schema::hasColumn('users', 'store_id')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->unsignedBigInteger('store_id')->nullable()->after('locale');
-                $table->unsignedBigInteger('customer_id')->nullable()->after('store_id');
-                $table->unsignedBigInteger('supplier_id')->nullable()->after('customer_id');
-            });
-        }
-
-        // ── Price & Customer Groups ─────────────────────────────────────
+        // ── Price & Customer Groups ───────────────────────────────────
         if (!Schema::hasTable('price_groups')) {
             Schema::create('price_groups', function (Blueprint $table) {
                 $table->id();
@@ -191,7 +215,10 @@ return new class extends Migration
             });
         }
 
-        // ── Customers & Suppliers ───────────────────────────────────────
+        // ── Customers ─────────────────────────────────────────────────
+        // Note: vat_no added by 2025_11_20 migration
+        // Note: telegram_user_id added by 2026_01_30 migration
+        // Note: points column NOT included (removed by 2026_01_12 migration)
         if (!Schema::hasTable('customers')) {
             Schema::create('customers', function (Blueprint $table) {
                 $table->id();
@@ -203,16 +230,17 @@ return new class extends Migration
                 $table->string('company')->nullable();
                 $table->string('email')->nullable();
                 $table->string('phone')->nullable();
-                $table->string('vat_no')->nullable();
                 $table->decimal('opening_balance', 25, 4)->default(0);
                 $table->decimal('due_limit', 25, 4)->nullable()->default(0);
-                $table->string('telegram_user_id')->nullable();
                 $table->json('extra_attributes')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
             });
         }
 
+        // ── Suppliers ─────────────────────────────────────────────────
+        // Note: vat_no added by 2026_02_01 migration
+        // Note: telegram_user_id added by 2026_01_30 migration
         if (!Schema::hasTable('suppliers')) {
             Schema::create('suppliers', function (Blueprint $table) {
                 $table->id();
@@ -222,9 +250,7 @@ return new class extends Migration
                 $table->string('company')->nullable();
                 $table->string('email')->nullable();
                 $table->string('phone')->nullable();
-                $table->string('vat_no')->nullable();
                 $table->decimal('opening_balance', 25, 4)->default(0);
-                $table->string('telegram_user_id')->nullable();
                 $table->json('extra_attributes')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
@@ -251,7 +277,7 @@ return new class extends Migration
             });
         }
 
-        // ── Taxes & Units ───────────────────────────────────────────────
+        // ── Taxes & Units ─────────────────────────────────────────────
         if (!Schema::hasTable('taxes')) {
             Schema::create('taxes', function (Blueprint $table) {
                 $table->id();
@@ -277,25 +303,14 @@ return new class extends Migration
             });
         }
 
-        // ── Accounts ────────────────────────────────────────────────────
-        if (!Schema::hasTable('account_types')) {
-            Schema::create('account_types', function (Blueprint $table) {
-                $table->id();
-                $table->string('name')->unique();
-                $table->string('code')->unique()->nullable();
-                $table->text('description')->nullable();
-                $table->boolean('active')->default(1);
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
+        // ── Accounts ──────────────────────────────────────────────────
+        // Note: account_type_id added by 2026_02_20 migration
+        // Note: type column changed by 2026_02_20 migration
         if (!Schema::hasTable('accounts')) {
             Schema::create('accounts', function (Blueprint $table) {
                 $table->id();
-                $table->unsignedBigInteger('account_type_id')->nullable();
                 $table->string('title');
+                $table->string('type')->nullable();
                 $table->text('details')->nullable();
                 $table->decimal('opening_balance', 25, 4)->default(0);
                 $table->boolean('active')->default(1);
@@ -305,38 +320,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('account_transfers')) {
-            Schema::create('account_transfers', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('from_account_id');
-                $table->unsignedBigInteger('to_account_id');
-                $table->unsignedBigInteger('user_id')->nullable();
-                $table->string('reference')->nullable();
-                $table->decimal('amount', 25, 4);
-                $table->text('note')->nullable();
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (!Schema::hasTable('account_transactions')) {
-            Schema::create('account_transactions', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('account_id');
-                $table->unsignedBigInteger('user_id')->nullable();
-                $table->date('date');
-                $table->string('type');
-                $table->decimal('amount', 25, 4);
-                $table->text('description')->nullable();
-                $table->string('reference')->nullable();
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        // ── Categories & Brands ─────────────────────────────────────────
+        // ── Categories & Brands ───────────────────────────────────────
         if (!Schema::hasTable('categories')) {
             Schema::create('categories', function (Blueprint $table) {
                 $table->id();
@@ -364,7 +348,8 @@ return new class extends Migration
             });
         }
 
-        // ── Products ────────────────────────────────────────────────────
+        // ── Products ──────────────────────────────────────────────────
+        // Note: type is string here; changed to enum by 2026_02_11 migration
         if (!Schema::hasTable('products')) {
             Schema::create('products', function (Blueprint $table) {
                 $table->id();
@@ -380,7 +365,7 @@ return new class extends Migration
                 $table->string('slug')->unique();
                 $table->text('description')->nullable();
                 $table->decimal('cost', 25, 4)->nullable()->default(0);
-                $table->string('type')->nullable()->default('standard');
+                $table->string('type')->nullable()->default('Standard');
                 $table->boolean('active')->default(1);
                 $table->boolean('dont_track_stock')->default(0);
                 $table->json('variants')->nullable();
@@ -459,20 +444,6 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('recipes')) {
-            Schema::create('recipes', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('product_id');
-                $table->unsignedBigInteger('ingredient_id');
-                $table->unsignedBigInteger('unit_id')->nullable();
-                $table->decimal('quantity', 15, 4)->default(1);
-                $table->integer('sort_order')->default(0);
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
         if (!Schema::hasTable('tracks')) {
             Schema::create('tracks', function (Blueprint $table) {
                 $table->id();
@@ -488,7 +459,44 @@ return new class extends Migration
             });
         }
 
-        // ── POS Registers ───────────────────────────────────────────────
+        if (!Schema::hasTable('unit_prices')) {
+            Schema::create('unit_prices', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('unit_id');
+                $table->morphs('priceable');
+                $table->decimal('price', 25, 4)->default(0);
+                $table->timestamps();
+            });
+        }
+
+        // ── Stock Counts ──────────────────────────────────────────────
+        if (!Schema::hasTable('stock_counts')) {
+            Schema::create('stock_counts', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('store_id');
+                $table->unsignedBigInteger('user_id');
+                $table->string('reference')->nullable()->unique();
+                $table->date('date');
+                $table->text('notes')->nullable();
+                $table->json('extra_attributes')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (!Schema::hasTable('stock_count_items')) {
+            Schema::create('stock_count_items', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('stock_count_id');
+                $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('variation_id')->nullable();
+                $table->decimal('counted_quantity', 25, 4)->default(0);
+                $table->decimal('system_quantity', 25, 4)->default(0);
+                $table->timestamps();
+            });
+        }
+
+        // ── POS Registers ─────────────────────────────────────────────
         if (!Schema::hasTable('registers')) {
             Schema::create('registers', function (Blueprint $table) {
                 $table->id();
@@ -504,55 +512,43 @@ return new class extends Migration
             });
         }
 
-        // ── Halls & Tables (Restaurant) ─────────────────────────────────
-        if (!Schema::hasTable('halls')) {
-            Schema::create('halls', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('store_id');
-                $table->unsignedBigInteger('user_id')->nullable();
-                $table->string('name');
-                $table->text('description')->nullable();
-                $table->boolean('active')->default(1);
-                $table->integer('sort_order')->default(0);
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (!Schema::hasTable('tables')) {
-            Schema::create('tables', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('hall_id');
-                $table->unsignedBigInteger('store_id');
-                $table->unsignedBigInteger('user_id')->nullable();
-                $table->string('name');
-                $table->integer('seats')->default(4);
-                $table->text('description')->nullable();
-                $table->boolean('active')->default(1);
-                $table->integer('sort_order')->default(0);
-                $table->uuid('qr_token')->unique();
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        // ── Sales ───────────────────────────────────────────────────────
-        if (!Schema::hasTable('sales')) {
-            Schema::create('sales', function (Blueprint $table) {
+        // ── POS Orders (separate from sales) ──────────────────────────
+        // Note: hall_id, table_id, reference_number, guests, notes added by 2026_02_11 migration
+        // Note: qr_fields added by 2026_02_22 migration
+        if (!Schema::hasTable('orders')) {
+            Schema::create('orders', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('customer_id')->nullable();
                 $table->unsignedBigInteger('user_id');
                 $table->unsignedBigInteger('store_id');
                 $table->unsignedBigInteger('register_id')->nullable();
+                $table->string('number')->unique();
+                $table->string('customer_name')->nullable();
+                $table->string('source')->nullable()->default('pos');
+                $table->string('status')->nullable()->default('pending');
+                $table->string('reference')->nullable();
+                $table->json('data')->nullable();
+                $table->string('order_for')->nullable();
+                $table->json('extra_attributes')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        // ── Sales ─────────────────────────────────────────────────────
+        // Note: hash added by 2025_10_29 migration
+        // Note: hall_id, table_id, reference_number, guests, notes added by 2026_02_11 migration
+        // Note: is_credit, credit_status added by 2026_05_09 migration
+        if (!Schema::hasTable('sales')) {
+            Schema::create('sales', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('customer_id')->nullable()->index();
+                $table->unsignedBigInteger('user_id');
+                $table->unsignedBigInteger('store_id');
+                $table->unsignedBigInteger('register_id')->nullable();
                 $table->unsignedBigInteger('address_id')->nullable();
-                $table->unsignedBigInteger('hall_id')->nullable();
-                $table->unsignedBigInteger('table_id')->nullable();
-                $table->string('order_number')->nullable();
                 $table->string('reference')->nullable()->unique();
-                $table->uuid('hash')->nullable();
-                $table->date('date');
+                $table->date('date')->index();
                 $table->date('due_date')->nullable();
                 $table->decimal('sub_total', 25, 4)->default(0);
                 $table->decimal('total_discount', 25, 4)->default(0);
@@ -566,15 +562,16 @@ return new class extends Migration
                 $table->json('fiscal_service_response')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
-                $table->index(['customer_id', 'date']);
             });
         }
 
+        // ── Sale Items ────────────────────────────────────────────────
+        // Note: promotions column added by 2025_08_29 migration
         if (!Schema::hasTable('sale_items')) {
             Schema::create('sale_items', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('sale_id');
-                $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('product_id')->nullable();
                 $table->unsignedBigInteger('unit_id')->nullable();
                 $table->unsignedBigInteger('register_id')->nullable();
                 $table->unsignedBigInteger('store_id');
@@ -605,7 +602,8 @@ return new class extends Migration
             });
         }
 
-        // ── Purchases ───────────────────────────────────────────────────
+        // ── Purchases ─────────────────────────────────────────────────
+        // Note: hash added by 2025_10_29 migration
         if (!Schema::hasTable('purchases')) {
             Schema::create('purchases', function (Blueprint $table) {
                 $table->id();
@@ -614,7 +612,6 @@ return new class extends Migration
                 $table->unsignedBigInteger('store_id');
                 $table->unsignedBigInteger('register_id')->nullable();
                 $table->string('reference')->nullable()->unique();
-                $table->uuid('hash')->nullable();
                 $table->date('date');
                 $table->decimal('sub_total', 25, 4)->default(0);
                 $table->decimal('total_discount', 25, 4)->default(0);
@@ -631,7 +628,7 @@ return new class extends Migration
             Schema::create('purchase_items', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('purchase_id');
-                $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('product_id')->nullable();
                 $table->unsignedBigInteger('unit_id')->nullable();
                 $table->unsignedBigInteger('store_id');
                 $table->decimal('quantity', 25, 4)->default(0);
@@ -654,7 +651,9 @@ return new class extends Migration
             });
         }
 
-        // ── Payments ────────────────────────────────────────────────────
+        // ── Payments ──────────────────────────────────────────────────
+        // Note: hash added by 2025_10_29 migration
+        // Note: method column type changed by 2025_08_29 migration
         if (!Schema::hasTable('payments')) {
             Schema::create('payments', function (Blueprint $table) {
                 $table->id();
@@ -664,10 +663,9 @@ return new class extends Migration
                 $table->unsignedBigInteger('store_id');
                 $table->unsignedBigInteger('register_id')->nullable();
                 $table->string('reference')->nullable()->unique();
-                $table->uuid('hash')->nullable();
                 $table->date('date')->index();
                 $table->decimal('amount', 25, 4);
-                $table->string('method');
+                $table->string('method')->nullable();
                 $table->string('payment_for')->nullable();
                 $table->boolean('received')->nullable()->default(0);
                 $table->json('method_data')->nullable();
@@ -688,7 +686,9 @@ return new class extends Migration
             });
         }
 
-        // ── Quotations ──────────────────────────────────────────────────
+        // ── Quotations ────────────────────────────────────────────────
+        // Note: hash added by 2025_10_29 migration
+        // Note: signature, signed_by_name, signed_at added by 2026_04_09 migration
         if (!Schema::hasTable('quotations')) {
             Schema::create('quotations', function (Blueprint $table) {
                 $table->id();
@@ -696,16 +696,13 @@ return new class extends Migration
                 $table->unsignedBigInteger('user_id');
                 $table->unsignedBigInteger('store_id');
                 $table->string('reference')->nullable()->unique();
-                $table->uuid('hash')->nullable();
                 $table->date('date');
                 $table->decimal('sub_total', 25, 4)->default(0);
                 $table->decimal('total_discount', 25, 4)->default(0);
                 $table->decimal('total_tax', 25, 4)->default(0);
                 $table->decimal('grand_total', 25, 4)->default(0);
-                $table->text('signature')->nullable();
                 $table->timestamp('emailed_at')->nullable();
                 $table->timestamp('converted_at')->nullable();
-                $table->timestamp('signed_at')->nullable();
                 $table->json('extra_attributes')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
@@ -716,7 +713,7 @@ return new class extends Migration
             Schema::create('quotation_items', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('quotation_id');
-                $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('product_id')->nullable();
                 $table->unsignedBigInteger('unit_id')->nullable();
                 $table->unsignedBigInteger('store_id');
                 $table->decimal('quantity', 25, 4)->default(0);
@@ -736,7 +733,9 @@ return new class extends Migration
             });
         }
 
-        // ── Return Orders ───────────────────────────────────────────────
+        // ── Return Orders ─────────────────────────────────────────────
+        // Note: hash added by 2025_10_29 migration
+        // Note: return_payment_amount, return_payment_method added by 2026_04_04 migration
         if (!Schema::hasTable('return_orders')) {
             Schema::create('return_orders', function (Blueprint $table) {
                 $table->id();
@@ -748,14 +747,12 @@ return new class extends Migration
                 $table->unsignedBigInteger('store_id');
                 $table->unsignedBigInteger('register_id')->nullable();
                 $table->string('reference')->nullable()->unique();
-                $table->uuid('hash')->nullable();
                 $table->string('type');
                 $table->date('date');
                 $table->decimal('sub_total', 25, 4)->default(0);
                 $table->decimal('total_discount', 25, 4)->default(0);
                 $table->decimal('total_tax', 25, 4)->default(0);
                 $table->decimal('grand_total', 25, 4)->default(0);
-                $table->decimal('return_payment', 25, 4)->nullable();
                 $table->json('extra_attributes')->nullable();
                 $table->json('fiscal_service_response')->nullable();
                 $table->timestamps();
@@ -767,7 +764,7 @@ return new class extends Migration
             Schema::create('return_order_items', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('return_order_id');
-                $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('product_id')->nullable();
                 $table->unsignedBigInteger('unit_id')->nullable();
                 $table->unsignedBigInteger('store_id');
                 $table->decimal('quantity', 25, 4)->default(0);
@@ -790,7 +787,8 @@ return new class extends Migration
             });
         }
 
-        // ── Deliveries ──────────────────────────────────────────────────
+        // ── Deliveries ────────────────────────────────────────────────
+        // Note: hash added by 2025_10_29 migration
         if (!Schema::hasTable('deliveries')) {
             Schema::create('deliveries', function (Blueprint $table) {
                 $table->id();
@@ -800,7 +798,6 @@ return new class extends Migration
                 $table->unsignedBigInteger('store_id');
                 $table->unsignedBigInteger('address_id')->nullable();
                 $table->string('reference')->nullable()->unique();
-                $table->uuid('hash')->nullable();
                 $table->date('date');
                 $table->text('details')->nullable();
                 $table->timestamp('delivered_at')->nullable();
@@ -810,7 +807,9 @@ return new class extends Migration
             });
         }
 
-        // ── Expenses & Incomes ──────────────────────────────────────────
+        // ── Expenses ──────────────────────────────────────────────────
+        // Note: hash added by 2025_10_29 migration
+        // Note: account_id added by 2026_02_21 migration
         if (!Schema::hasTable('expenses')) {
             Schema::create('expenses', function (Blueprint $table) {
                 $table->id();
@@ -818,9 +817,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('user_id');
                 $table->unsignedBigInteger('store_id');
                 $table->unsignedBigInteger('register_id')->nullable();
-                $table->unsignedBigInteger('account_id')->nullable();
                 $table->string('reference')->nullable()->unique();
-                $table->uuid('hash')->nullable();
                 $table->date('date');
                 $table->decimal('amount', 25, 4);
                 $table->text('details')->nullable();
@@ -830,26 +827,9 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('incomes')) {
-            Schema::create('incomes', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('customer_id')->nullable();
-                $table->unsignedBigInteger('user_id');
-                $table->unsignedBigInteger('store_id');
-                $table->unsignedBigInteger('register_id')->nullable();
-                $table->unsignedBigInteger('account_id')->nullable();
-                $table->string('reference')->nullable()->unique();
-                $table->uuid('hash')->nullable();
-                $table->date('date');
-                $table->decimal('amount', 25, 4);
-                $table->text('details')->nullable();
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        // ── Transfers & Adjustments ─────────────────────────────────────
+        // ── Stock Transfers ───────────────────────────────────────────
+        // Note: hash added by 2025_10_29 migration
+        // Note: account_transfers is a SEPARATE table created by 2026_02_20 migration
         if (!Schema::hasTable('transfers')) {
             Schema::create('transfers', function (Blueprint $table) {
                 $table->id();
@@ -857,7 +837,6 @@ return new class extends Migration
                 $table->unsignedBigInteger('store_id');
                 $table->unsignedBigInteger('to_store_id');
                 $table->string('reference')->nullable()->unique();
-                $table->uuid('hash')->nullable();
                 $table->string('type')->nullable();
                 $table->date('date');
                 $table->text('details')->nullable();
@@ -877,13 +856,13 @@ return new class extends Migration
             });
         }
 
+        // ── Adjustments ───────────────────────────────────────────────
         if (!Schema::hasTable('adjustments')) {
             Schema::create('adjustments', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('user_id');
                 $table->unsignedBigInteger('store_id');
                 $table->string('reference')->nullable()->unique();
-                $table->uuid('hash')->nullable();
                 $table->string('type')->nullable();
                 $table->date('date');
                 $table->text('details')->nullable();
@@ -904,34 +883,8 @@ return new class extends Migration
             });
         }
 
-        // ── Stock Counts ────────────────────────────────────────────────
-        if (!Schema::hasTable('stock_counts')) {
-            Schema::create('stock_counts', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('store_id');
-                $table->unsignedBigInteger('user_id');
-                $table->string('reference')->nullable()->unique();
-                $table->date('date');
-                $table->text('notes')->nullable();
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (!Schema::hasTable('stock_count_items')) {
-            Schema::create('stock_count_items', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('stock_count_id');
-                $table->unsignedBigInteger('product_id');
-                $table->unsignedBigInteger('variation_id')->nullable();
-                $table->decimal('counted_quantity', 25, 4)->default(0);
-                $table->decimal('system_quantity', 25, 4)->default(0);
-                $table->timestamps();
-            });
-        }
-
-        // ── Gift Cards & Award Points ────────────────────────────────────
+        // ── Gift Cards & Award Points ──────────────────────────────────
+        // Note: details, use_award_points, award_points added by 2026_01_12 migration
         if (!Schema::hasTable('gift_cards')) {
             Schema::create('gift_cards', function (Blueprint $table) {
                 $table->id();
@@ -941,20 +894,17 @@ return new class extends Migration
                 $table->string('number')->unique();
                 $table->decimal('amount', 25, 4)->default(0);
                 $table->date('expiry_date')->nullable();
-                $table->integer('award_points')->nullable();
-                $table->boolean('use_award_points')->default(0);
-                $table->text('details')->nullable();
                 $table->json('extra_attributes')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
             });
         }
 
+        // Note: gift_card_id added by 2026_01_12 migration
         if (!Schema::hasTable('award_points')) {
             Schema::create('award_points', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('sale_id')->nullable();
-                $table->unsignedBigInteger('gift_card_id')->nullable();
                 $table->unsignedBigInteger('customer_id');
                 $table->unsignedBigInteger('user_id')->nullable();
                 $table->unsignedBigInteger('store_id');
@@ -964,7 +914,8 @@ return new class extends Migration
             });
         }
 
-        // ── Promotions ──────────────────────────────────────────────────
+        // ── Promotions ────────────────────────────────────────────────
+        // Note: promotion_store table created by 2026_02_02 migration
         if (!Schema::hasTable('promotions')) {
             Schema::create('promotions', function (Blueprint $table) {
                 $table->id();
@@ -1000,15 +951,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('promotion_store')) {
-            Schema::create('promotion_store', function (Blueprint $table) {
-                $table->unsignedBigInteger('promotion_id');
-                $table->unsignedBigInteger('store_id');
-                $table->primary(['promotion_id', 'store_id']);
-            });
-        }
-
-        // ── Custom Fields ────────────────────────────────────────────────
+        // ── Custom Fields ─────────────────────────────────────────────
         if (!Schema::hasTable('custom_fields')) {
             Schema::create('custom_fields', function (Blueprint $table) {
                 $table->id();
@@ -1026,242 +969,7 @@ return new class extends Migration
             });
         }
 
-        // ── Assets ──────────────────────────────────────────────────────
-        if (!Schema::hasTable('asset_categories')) {
-            Schema::create('asset_categories', function (Blueprint $table) {
-                $table->id();
-                $table->string('name');
-                $table->text('description')->nullable();
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (!Schema::hasTable('assets')) {
-            Schema::create('assets', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('asset_category_id')->nullable();
-                $table->string('name');
-                $table->string('code')->unique();
-                $table->text('description')->nullable();
-                $table->decimal('purchase_price', 25, 4)->nullable();
-                $table->date('purchase_date')->nullable();
-                $table->decimal('depreciation_rate', 8, 4)->nullable();
-                $table->string('status')->default('active');
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (!Schema::hasTable('asset_maintenances')) {
-            Schema::create('asset_maintenances', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('asset_id');
-                $table->date('maintenance_date');
-                $table->decimal('cost', 25, 4)->default(0);
-                $table->text('description')->nullable();
-                $table->date('next_maintenance_date')->nullable();
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (!Schema::hasTable('asset_allocations')) {
-            Schema::create('asset_allocations', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('asset_id');
-                $table->string('allocated_to')->nullable();
-                $table->date('allocated_date');
-                $table->string('status')->default('allocated');
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        // ── HR ──────────────────────────────────────────────────────────
-        if (!Schema::hasTable('employees')) {
-            Schema::create('employees', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('user_id')->nullable();
-                $table->unsignedBigInteger('store_id')->nullable();
-                $table->string('department')->nullable();
-                $table->string('job_title')->nullable();
-                $table->date('hire_date')->nullable();
-                $table->decimal('basic_salary', 15, 4)->default(0);
-                $table->unsignedTinyInteger('working_days_per_month')->default(26);
-                $table->unsignedTinyInteger('working_hours_per_day')->default(8);
-                $table->text('notes')->nullable();
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (!Schema::hasTable('leave_types')) {
-            Schema::create('leave_types', function (Blueprint $table) {
-                $table->id();
-                $table->string('name');
-                $table->integer('days_per_year')->default(0);
-                $table->text('description')->nullable();
-                $table->boolean('is_paid')->default(1);
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (!Schema::hasTable('leaves')) {
-            Schema::create('leaves', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('employee_id');
-                $table->unsignedBigInteger('leave_type_id');
-                $table->date('start_date');
-                $table->date('end_date');
-                $table->integer('days_count')->default(0);
-                $table->string('status')->default('pending');
-                $table->text('reason')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (!Schema::hasTable('attendances')) {
-            Schema::create('attendances', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('employee_id');
-                $table->date('date');
-                $table->time('check_in')->nullable();
-                $table->time('check_out')->nullable();
-                $table->string('status')->default('present');
-                $table->text('notes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-                $table->unique(['employee_id', 'date']);
-            });
-        }
-
-        if (!Schema::hasTable('payrolls')) {
-            Schema::create('payrolls', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('store_id');
-                $table->unsignedBigInteger('user_id');
-                $table->string('title');
-                $table->unsignedTinyInteger('month');
-                $table->unsignedSmallInteger('year');
-                $table->enum('status', ['draft', 'processed', 'paid'])->default('draft');
-                $table->decimal('total_amount', 15, 4)->default(0);
-                $table->text('notes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-                $table->unique(['store_id', 'month', 'year']);
-            });
-        }
-
-        if (!Schema::hasTable('payslips')) {
-            Schema::create('payslips', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('payroll_id');
-                $table->unsignedBigInteger('employee_id');
-                $table->decimal('basic_salary', 15, 4)->default(0);
-                $table->unsignedSmallInteger('working_days')->default(0);
-                $table->unsignedSmallInteger('present_days')->default(0);
-                $table->unsignedSmallInteger('absent_days')->default(0);
-                $table->unsignedSmallInteger('on_leave_days_paid')->default(0);
-                $table->unsignedSmallInteger('on_leave_days_unpaid')->default(0);
-                $table->decimal('overtime_hours', 8, 2)->default(0);
-                $table->decimal('overtime_rate', 15, 4)->default(0);
-                $table->decimal('overtime_amount', 15, 4)->default(0);
-                $table->decimal('gross_salary', 15, 4)->default(0);
-                $table->decimal('absent_deduction', 15, 4)->default(0);
-                $table->decimal('unpaid_leave_deduction', 15, 4)->default(0);
-                $table->decimal('total_deductions', 15, 4)->default(0);
-                $table->decimal('total_allowances', 15, 4)->default(0);
-                $table->decimal('net_salary', 15, 4)->default(0);
-                $table->enum('status', ['draft', 'paid'])->default('draft');
-                $table->date('paid_at')->nullable();
-                $table->text('notes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (!Schema::hasTable('payslip_items')) {
-            Schema::create('payslip_items', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('payslip_id');
-                $table->enum('type', ['allowance', 'deduction']);
-                $table->string('description');
-                $table->decimal('amount', 15, 4)->default(0);
-                $table->timestamps();
-            });
-        }
-
-        if (!Schema::hasTable('claims')) {
-            Schema::create('claims', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('employee_id');
-                $table->date('claim_date');
-                $table->decimal('amount', 15, 4)->default(0);
-                $table->text('description')->nullable();
-                $table->string('status')->default('pending');
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        // ── Repair Orders ────────────────────────────────────────────────
-        if (!Schema::hasTable('technicians')) {
-            Schema::create('technicians', function (Blueprint $table) {
-                $table->id();
-                $table->string('name');
-                $table->string('email')->nullable()->unique();
-                $table->string('phone')->nullable();
-                $table->text('skills')->nullable();
-                $table->text('description')->nullable();
-                $table->boolean('active')->default(1);
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (!Schema::hasTable('service_types')) {
-            Schema::create('service_types', function (Blueprint $table) {
-                $table->id();
-                $table->string('name');
-                $table->string('code')->nullable()->unique();
-                $table->text('description')->nullable();
-                $table->decimal('default_cost', 15, 4)->nullable();
-                $table->boolean('active')->default(1);
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        if (!Schema::hasTable('repair_orders')) {
-            Schema::create('repair_orders', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('customer_id')->nullable();
-                $table->unsignedBigInteger('user_id');
-                $table->unsignedBigInteger('store_id');
-                $table->string('reference')->nullable()->unique();
-                $table->text('product_description')->nullable();
-                $table->text('issue_description')->nullable();
-                $table->string('status')->default('pending');
-                $table->decimal('cost', 15, 4)->default(0);
-                $table->decimal('total_tax', 15, 4)->default(0);
-                $table->decimal('total_cost', 15, 4)->default(0);
-                $table->json('extra_attributes')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
-
-        // ── Activity Log (Spatie) ────────────────────────────────────────
+        // ── Activity Log (Spatie) ─────────────────────────────────────
         if (!Schema::hasTable('activity_log')) {
             Schema::create('activity_log', function (Blueprint $table) {
                 $table->id();
@@ -1277,16 +985,7 @@ return new class extends Migration
             });
         }
 
-        // ── Password Reset ───────────────────────────────────────────────
-        if (!Schema::hasTable('password_reset_tokens')) {
-            Schema::create('password_reset_tokens', function (Blueprint $table) {
-                $table->string('email')->primary();
-                $table->string('token');
-                $table->timestamp('created_at')->nullable();
-            });
-        }
-
-        // ── QR Orders ────────────────────────────────────────────────────
+        // ── QR Orders ─────────────────────────────────────────────────
         if (!Schema::hasTable('qr_orders')) {
             Schema::create('qr_orders', function (Blueprint $table) {
                 $table->id();
@@ -1301,57 +1000,28 @@ return new class extends Migration
                 $table->timestamps();
             });
         }
-
-        // ── Cost Allocations ─────────────────────────────────────────────
-        if (!Schema::hasTable('cost_allocations')) {
-            Schema::create('cost_allocations', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('sale_item_id')->nullable();
-                $table->unsignedBigInteger('purchase_item_id')->nullable();
-                $table->unsignedBigInteger('return_order_item_id')->nullable();
-                $table->unsignedBigInteger('product_id')->nullable();
-                $table->unsignedBigInteger('variation_id')->nullable();
-                $table->unsignedBigInteger('store_id');
-                $table->string('type')->nullable();
-                $table->decimal('amount', 25, 4)->default(0);
-                $table->timestamps();
-            });
-        }
-
-        // ── Unit Prices ──────────────────────────────────────────────────
-        if (!Schema::hasTable('unit_prices')) {
-            Schema::create('unit_prices', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('unit_id');
-                $table->morphs('priceable');
-                $table->decimal('price', 25, 4)->default(0);
-                $table->timestamps();
-            });
-        }
     }
 
     public function down(): void
     {
-        // Tables dropped in reverse order of creation to respect foreign keys
         $tables = [
-            'unit_prices', 'cost_allocations', 'qr_orders', 'password_reset_tokens',
-            'activity_log', 'repair_orders', 'service_types', 'technicians',
-            'claims', 'payslip_items', 'payslips', 'payrolls', 'attendances',
-            'leaves', 'leave_types', 'employees', 'asset_allocations',
-            'asset_maintenances', 'assets', 'asset_categories', 'custom_fields',
-            'promotion_store', 'promotion_product', 'promotion_category', 'promotions',
-            'award_points', 'gift_cards', 'stock_count_items', 'stock_counts',
+            'qr_orders', 'activity_log', 'custom_fields',
+            'promotion_product', 'promotion_category', 'promotions',
+            'award_points', 'gift_cards',
             'adjustment_items', 'adjustments', 'transfer_items', 'transfers',
-            'incomes', 'expenses', 'deliveries', 'return_order_items', 'return_orders',
+            'expenses', 'deliveries', 'return_order_items', 'return_orders',
             'quotation_items', 'quotations', 'payables', 'payments',
             'purchase_items', 'purchases', 'sale_item_tax', 'sale_items', 'sales',
-            'tables', 'halls', 'registers', 'tracks', 'recipes', 'serials',
-            'stocks', 'product_tax', 'product_product', 'product_stores',
-            'variations', 'products', 'brands', 'categories', 'units', 'taxes',
-            'account_transactions', 'account_transfers', 'accounts', 'account_types',
-            'addresses', 'suppliers', 'customers', 'customer_groups', 'price_groups',
-            'stores', 'settings', 'notifications', 'failed_jobs', 'jobs', 'sessions',
-            'users', 'role_has_permissions', 'model_has_roles', 'model_has_permissions',
+            'orders', 'registers',
+            'stock_count_items', 'stock_counts', 'unit_prices',
+            'tracks', 'serials', 'stocks',
+            'product_tax', 'product_product', 'product_stores', 'variations', 'products',
+            'brands', 'categories', 'accounts',
+            'units', 'taxes', 'addresses', 'suppliers', 'customers',
+            'customer_groups', 'price_groups', 'stores', 'settings',
+            'notifications', 'failed_jobs', 'jobs', 'sessions',
+            'password_reset_tokens', 'users',
+            'role_has_permissions', 'model_has_roles', 'model_has_permissions',
             'roles', 'permissions',
         ];
         foreach ($tables as $table) {
