@@ -1,0 +1,64 @@
+{
+	"name": "tecdiary/laravel-captcha",
+	"type": "package",
+    "version": "1.0.0",
+	"description": "Laravel Captcha Package",
+	"keywords": ["laravel Captcha", "laravel Security", "Captcha"],
+	"homepage": "https://github.com/tecdiary/laravel-captcha",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Muharrem ERİN",
+			"email": "me@mewebstudio.com",
+			"homepage": "https://github.com/mewebstudio",
+			"role": "Developer"
+		},
+        {
+			"name": "Mian Saleem",
+			"email": "contact@tecdiary.com",
+			"homepage": "https://github.com/tecdiary",
+			"role": "Developer"
+		}
+	],
+	"require": {
+    "php": "^8.3",
+		"ext-gd": "*",
+		"illuminate/config": "~11|^12|^13",
+		"illuminate/filesystem": "~11|^12|^13",
+		"illuminate/support": "~11|^12|^13",
+		"illuminate/hashing": "~11|^12|^13",
+		"illuminate/session": "~11|^12|^13",
+		"intervention/image": "^4.0"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^11",
+		"mockery/mockery": "^1.3"
+	},
+	"autoload": {
+		"psr-4": {
+			"Tec\\Captcha\\": "src/"
+		},
+		"files": [
+			"src/helpers.php"
+		]
+	},
+	"autoload-dev": {
+		"classmap": [
+			"tests"
+		],
+		"psr-4": {
+			"Tec\\Test\\": "tests/"
+		}
+	},
+	"minimum-stability": "stable",
+	"extra": {
+		"laravel": {
+			"providers": [
+				"Tec\\Captcha\\CaptchaServiceProvider"
+			],
+			"aliases": {
+				"Captcha": "Tec\\Captcha\\Facades\\Captcha"
+			}
+		}
+	}
+}

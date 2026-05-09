@@ -164,7 +164,7 @@ ok ".env configured"
 # ── 13. PHP dependencies ─────────────────────────────────
 info "Installing PHP dependencies..."
 cd "${APP_DIR}"
-composer install --no-dev --optimize-autoloader --no-interaction -q
+COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction -q
 ok "PHP dependencies installed"
 
 # ── 14. Frontend ─────────────────────────────────────────
