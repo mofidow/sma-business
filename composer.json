@@ -116,14 +116,14 @@
             "type": "path",
             "url": "./packages/installer",
             "options": {
-                "symlink": true
+                "symlink": false
             }
         },
         {
             "type": "path",
             "url": "./packages/laravel-captcha",
             "options": {
-                "symlink": true
+                "symlink": false
             }
         }
     ]
