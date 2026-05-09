@@ -81,7 +81,7 @@ ok "Redis installed"
 
 # ── 6. Node.js 20 ────────────────────────────────────────
 info "Installing Node.js 20..."
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash - -qq
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt install -y -qq nodejs
 ok "Node.js $(node -v) installed"
 
