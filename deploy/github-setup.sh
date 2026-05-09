@@ -117,6 +117,7 @@ apt install -y -qq git
 git config --global --add safe.directory "${APP_DIR}"
 if [ -d "${APP_DIR}/.git" ]; then
     info "Directory exists — pulling latest code..."
+    git -C "${APP_DIR}" reset --hard HEAD
     git -C "${APP_DIR}" pull origin master
 else
     mkdir -p "${APP_DIR}"
