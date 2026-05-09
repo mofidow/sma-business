@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('reference')->nullable();
             $table->foreignId('sale_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('customer_id')->constrained()->nullOnDelete();
-            $table->foreignId('store_id')->constrained()->nullOnDelete();
+            $table->foreignId('customer_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('store_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->decimal('amount', 22, 4)->default(0);
             $table->decimal('paid_amount', 22, 4)->default(0);
