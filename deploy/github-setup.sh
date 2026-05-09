@@ -114,6 +114,7 @@ ok "Certbot installed"
 # ── 10. Git clone ────────────────────────────────────────
 info "Cloning app from GitHub..."
 apt install -y -qq git
+git config --global --add safe.directory "${APP_DIR}"
 if [ -d "${APP_DIR}/.git" ]; then
     info "Directory exists — pulling latest code..."
     git -C "${APP_DIR}" pull origin master
