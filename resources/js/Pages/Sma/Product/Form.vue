@@ -177,7 +177,7 @@ const confirmDeleteAttachment = attachment => {
 };
 
 const deleteAttachment = () => {
-  router.delete(route('attachments.destroy', selectedAttachment.value.id), {
+  router.delete(route('sma.attachments.destroy', selectedAttachment.value.id), {
     preserveScroll: true,
     onFinish: () => {
       deleteAttachmentModal.value = false;

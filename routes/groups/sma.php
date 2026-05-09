@@ -125,6 +125,6 @@ Route::middleware([
     Route::prefix('hr')->group(base_path('routes/groups/hr.php'));
 
     // Attachments Routes
-    Route::get('/attachments/{attachment:uuid}', [Sma\AttachmentController::class, 'download'])->name('attachments.download');
-    Route::delete('/attachments/{attachment}', [Sma\AttachmentController::class, 'destroy'])->name('attachments.destroy');
+    Route::get('/attachments/{attachment:uuid}', [Sma\AttachmentController::class, 'download'])->name('sma.attachments.download');
+    Route::delete('/attachments/{attachment}', [Sma\AttachmentController::class, 'destroy'])->name('sma.attachments.destroy');
 });

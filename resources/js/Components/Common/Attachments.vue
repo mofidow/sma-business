@@ -13,7 +13,7 @@ defineProps({
 });
 
 const destroy = () => {
-  router.delete(route('attachments.destroy', selected.value.id), {
+  router.delete(route('sma.attachments.destroy', selected.value.id), {
     onFinish: closeModal,
   });
 };
@@ -48,7 +48,7 @@ const closeModal = () => {
           </div>
         </div>
         <div class="ms-4 flex shrink-0 items-center gap-2">
-          <a :href="route('attachments.download', attachment.uuid)" class="link font-medium">{{ $t('Download') }}</a>
+          <a :href="route('sma.attachments.download', attachment.uuid)" class="link font-medium">{{ $t('Download') }}</a>
           <button
             type="button"
             @click="openModal(attachment)"
