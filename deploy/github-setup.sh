@@ -28,9 +28,10 @@ read -rp "GitHub repo URL (e.g. https://github.com/youruser/sma-business.git): "
 read -rp "Enter your domain name (e.g. sma.example.com): " DOMAIN
 read -rp "Enter MySQL root password to set: " DB_ROOT_PASS
 read -rp "Enter app database password to set: " DB_APP_PASS
-read -rp "Enter your WAAFI Merchant UID: " WAAFI_UID
-read -rp "Enter your WAAFI API User ID:  " WAAFI_USER
-read -rp "Enter your WAAFI API Key:      " WAAFI_KEY
+echo ""
+echo "  (WAAFI Pay credentials are configured inside the app:"
+echo "   Admin Panel → Settings → Payments → WAAFI Pay)"
+echo ""
 
 DB_NAME="sma_db"
 DB_USER="sma_user"
@@ -142,9 +143,9 @@ MAIL_MAILER=log
 
 FILESYSTEM_DISK=local
 
-WAAFI_MERCHANT_UID=${WAAFI_UID}
-WAAFI_API_USER_ID=${WAAFI_USER}
-WAAFI_API_KEY=${WAAFI_KEY}
+WAAFI_MERCHANT_UID=
+WAAFI_API_USER_ID=
+WAAFI_API_KEY=
 WAAFI_ENABLED=true
 ENV
 chown www-data:www-data "${APP_DIR}/.env"
@@ -280,9 +281,14 @@ echo "╔═══════════════════════�
 echo "║  ✓ SMA is LIVE!                                         ║"
 echo "║                                                          ║"
 echo "║  Open in browser: https://${DOMAIN}          ║"
-echo "║  Admin login:     /admin                                 ║"
 echo "║                                                          ║"
-echo "║  To deploy updates:                                      ║"
+echo "║  NEXT STEPS IN THE ADMIN PANEL:                          ║"
+echo "║  1. Log in at /admin                                     ║"
+echo "║  2. Go to Settings → Payments → WAAFI Pay                ║"
+echo "║     Enter your Merchant UID, API User ID, API Key        ║"
+echo "║  3. Go to Settings → General → set your business name    ║"
+echo "║                                                          ║"
+echo "║  To deploy updates later:                                ║"
 echo "║    cd ${APP_DIR} && bash deploy/deploy.sh        ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
