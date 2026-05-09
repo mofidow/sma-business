@@ -1,0 +1,21 @@
+resources/js/components/ui/*
+resources/views/mail/*
+.ai/*
+.ai/guidelines/*
+.github/*
+.DS_Store
+node_modules
+/build
+/.svelte-kit
+packages
+/packages
+packages/*
+/packages/*
+.env
+.env.*
+!.env.example
+
+# Ignore files for PNPM, NPM and YARN
+pnpm-lock.yaml
+package-lock.json
+yarn.lock

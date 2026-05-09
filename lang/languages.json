@@ -1,0 +1,20 @@
+{
+    "instruction": "App dropdown uses the below available array. Set rtl: true for RTL languages.",
+    "available": [
+        { "value": "ar", "label": "Arabic", "flag": "SA", "rtl": true },
+        { "value": "zh", "label": "Chinese", "flag": "CN", "rtl": false },
+        { "value": "en", "label": "English", "flag": "US", "rtl": false },
+        { "value": "fr", "label": "French", "flag": "FR", "rtl": false },
+        { "value": "de", "label": "German", "flag": "DE", "rtl": false },
+        { "value": "id", "label": "Indonesian", "flag": "ID", "rtl": false },
+        { "value": "it", "label": "Italian", "flag": "IT", "rtl": false },
+        { "value": "ja", "label": "Japanese", "flag": "JP", "rtl": false },
+        { "value": "ko", "label": "Korean", "flag": "KR", "rtl": false },
+        { "value": "pt", "label": "Portuguese", "flag": "PT", "rtl": false },
+        { "value": "ru", "label": "Russian", "flag": "RU", "rtl": false },
+        { "value": "es", "label": "Spanish", "flag": "ES", "rtl": false },
+        { "value": "th", "label": "Thai", "flag": "TH", "rtl": false },
+        { "value": "tr", "label": "Turkish", "flag": "TR", "rtl": false },
+        { "value": "so", "label": "Somali", "flag": "SO", "rtl": false }
+    ]
+}

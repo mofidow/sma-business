@@ -1,0 +1,857 @@
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/laravel/jetstream/**/*.blade.php';
+@source '../views/**/*.blade.php';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-gray-50: var(--color-zinc-50);
+  --color-gray-100: var(--color-zinc-100);
+  --color-gray-200: var(--color-zinc-200);
+  --color-gray-300: var(--color-zinc-300);
+  --color-gray-400: var(--color-zinc-400);
+  --color-gray-500: var(--color-zinc-500);
+  --color-gray-600: var(--color-zinc-600);
+  --color-gray-700: var(--color-zinc-700);
+  --color-gray-800: var(--color-zinc-800);
+  --color-gray-900: var(--color-zinc-900);
+  --color-gray-950: var(--color-zinc-950);
+
+  --color-error-50: var(--color-red-50);
+  --color-error-100: var(--color-red-100);
+  --color-error-200: var(--color-red-200);
+  --color-error-300: var(--color-red-300);
+  --color-error-400: var(--color-red-400);
+  --color-error-500: var(--color-red-500);
+  --color-error-600: var(--color-red-600);
+  --color-error-700: var(--color-red-700);
+  --color-error-800: var(--color-red-800);
+  --color-error-900: var(--color-red-900);
+  --color-error-950: var(--color-red-950);
+
+  --color-primary-50: var(--color-blue-50);
+  --color-primary-100: var(--color-blue-100);
+  --color-primary-200: var(--color-blue-200);
+  --color-primary-300: var(--color-blue-300);
+  --color-primary-400: var(--color-blue-400);
+  --color-primary-500: var(--color-blue-500);
+  --color-primary-600: var(--color-blue-600);
+  --color-primary-700: var(--color-blue-700);
+  --color-primary-800: var(--color-blue-800);
+  --color-primary-900: var(--color-blue-900);
+  --color-primary-950: var(--color-blue-950);
+
+  --color-success-50: var(--color-green-50);
+  --color-success-100: var(--color-green-100);
+  --color-success-200: var(--color-green-200);
+  --color-success-300: var(--color-green-300);
+  --color-success-400: var(--color-green-400);
+  --color-success-500: var(--color-green-500);
+  --color-success-600: var(--color-green-600);
+  --color-success-700: var(--color-green-700);
+  --color-success-800: var(--color-green-800);
+  --color-success-900: var(--color-green-900);
+  --color-success-950: var(--color-green-950);
+
+  --color-secondary-50: var(--color-sky-50);
+  --color-secondary-100: var(--color-sky-100);
+  --color-secondary-200: var(--color-sky-200);
+  --color-secondary-300: var(--color-sky-300);
+  --color-secondary-400: var(--color-sky-400);
+  --color-secondary-500: var(--color-sky-500);
+  --color-secondary-600: var(--color-sky-600);
+  --color-secondary-700: var(--color-sky-700);
+  --color-secondary-800: var(--color-sky-800);
+  --color-secondary-900: var(--color-sky-900);
+  --color-secondary-950: var(--color-sky-950);
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+:root {
+  --dp-input-padding: 0.5rem 1.75rem 0.5rem 0.75rem;
+}
+
+html,
+body {
+  @apply min-w-96 bg-gray-50 text-gray-700 antialiased dark:bg-gray-800 dark:text-gray-300;
+}
+button {
+  @apply cursor-pointer;
+}
+[x-cloak] {
+  display: none;
+}
+
+.text-focus {
+  @apply text-gray-950 dark:text-gray-50 print:text-black;
+}
+.text-mute {
+  @apply text-gray-500 dark:text-gray-400 print:text-gray-600;
+}
+
+.link {
+  @apply text-primary-700 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-100;
+}
+.link-red {
+  @apply text-red-700 hover:text-red-900 dark:text-red-300 dark:hover:text-red-100;
+}
+.error {
+  @apply border-red-500 dark:border-red-500;
+}
+textarea {
+  min-height: 58px;
+}
+.btn-primary {
+  @apply inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-xs font-semibold text-white uppercase transition duration-150 ease-in-out hover:bg-primary-500 focus:bg-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-hidden active:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-primary-600 dark:bg-primary-600 dark:text-white dark:hover:bg-primary-500 dark:focus:bg-primary-500 dark:focus:ring-primary-500 dark:active:bg-primary-500 dark:disabled:hover:bg-primary-600;
+}
+.btn-primary.large {
+  @apply px-6 py-3 text-sm;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center rounded-md border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 uppercase shadow-xs transition duration-150 ease-in-out hover:bg-gray-50 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-hidden disabled:opacity-25 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-offset-gray-800;
+}
+.btn-danger {
+  @apply inline-flex items-center justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-xs font-semibold text-white uppercase transition duration-150 ease-in-out hover:bg-red-500 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-hidden active:bg-red-700 dark:focus:ring-offset-gray-800;
+}
+
+.qrcode svg,
+.qr-image svg {
+  @apply h-full max-h-full max-w-full;
+}
+
+.rounded-corners {
+  @apply rounded-md border border-gray-300 dark:border-gray-700;
+}
+.rounded-corners thead {
+  @apply rounded-t-md;
+}
+.rounded-corners tr:first-child th {
+  @apply border-t-0;
+}
+.rounded-corners table,
+.rounded-corners table tbody:last-child,
+.rounded-corners table tbody:last-child tr:last-child td {
+  @apply border-b-0;
+}
+.rounded-corners tr th:first-child {
+  @apply rounded-tl-md border-l-0;
+}
+.rounded-corners tr th:last-child {
+  @apply rounded-tr-md border-r-0;
+}
+.rounded-corners tr td:first-child {
+  @apply rounded-bl-md border-l-0;
+}
+.rounded-corners tr td:last-child {
+  @apply rounded-br-md border-r-0;
+}
+
+.z-1 {
+  z-index: 1;
+}
+
+.scroll-box {
+  overflow: auto;
+  background:
+    linear-gradient(#fff 33%, #fff0),
+    linear-gradient(#fff0, #fff 66%) 0 100%,
+    radial-gradient(farthest-side at 50% 0, #66666680, #0000),
+    radial-gradient(farthest-side at 50% 100%, #66666680, #0000) 0 100%;
+  background-color: #fff;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+  background-size:
+    100% 48px,
+    100% 48px,
+    100% 5px,
+    100% 5px;
+}
+.dark .scroll-box {
+  overflow: auto;
+  background:
+    linear-gradient(var(--color-gray-950) 33%, #fff0),
+    linear-gradient(#fff0, var(--color-gray-950) 66%) 0 100%,
+    radial-gradient(farthest-side at 50% 0, rgba(150, 150, 150, 0.75), #0000),
+    radial-gradient(farthest-side at 50% 100%, rgba(150, 150, 150, 0.75), #0000) 0 100%;
+  background-color: var(--color-gray-950);
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+  background-size:
+    100% 48px,
+    100% 48px,
+    100% 6px,
+    100% 6px;
+}
+
+table tr.deleted {
+  @apply bg-red-50 dark:bg-red-950;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+/* Table fixed columns */
+@media (min-width: 1024px) {
+  .fixed-selection tr th:first-child,
+  .fixed-selection tr td:first-child {
+    @apply sticky start-0 bg-gray-50 pe-8 dark:bg-gray-950;
+  }
+  .fixed-actions th:last-child,
+  .fixed-actions td:last-child {
+    @apply sticky end-0 bg-gray-50 ps-4 dark:bg-gray-950;
+  }
+  .fixed-actions td.deleted:last-child,
+  .fixed-actions tr.deleted td:last-child {
+    @apply sticky end-0 bg-red-50 ps-4 dark:bg-red-950;
+  }
+  .fixed-selection tr th:first-child,
+  .fixed-actions th:last-child {
+    @apply bg-gray-50 dark:bg-gray-800;
+  }
+}
+
+/*
+  Transition Animations
+*/
+.sidebar-slide-enter-active,
+.sidebar-slide-leave-active {
+  @apply transform transition duration-500 ease-in-out;
+}
+.sidebar-slide-enter-from,
+.sidebar-slide-leave-to {
+  @apply -translate-x-full;
+}
+.sidebar-slide-enter-to,
+.sidebar-slide-leave-from {
+  @apply translate-x-0;
+}
+
+.slide-down-enter-active,
+.slide-down-leave-active {
+  @apply transform transition-all duration-100;
+}
+.slide-down-enter-from,
+.slide-down-leave-to {
+  @apply h-0 -translate-y-full;
+}
+.slide-down-enter-to,
+.slide-down-leave-from {
+  @apply h-auto translate-y-0;
+}
+
+.drawer-slide-enter-active,
+.drawer-slide-leave-active {
+  @apply transform transition duration-500 ease-in-out;
+}
+.drawer-slide-enter-from,
+.drawer-slide-leave-to {
+  @apply translate-x-full;
+}
+.drawer-slide-enter-to,
+.drawer-slide-leave-from {
+  @apply translate-x-0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  @apply duration-200 ease-in-out;
+}
+.fade-enter-from,
+.fade-leave-to {
+  @apply opacity-0;
+}
+.fade-enter-to,
+.fade-leave-from {
+  @apply opacity-100;
+}
+
+/* Progress bar style */
+progress::-webkit-progress-bar {
+  border-radius: 100px;
+  background-color: #dadada;
+}
+progress::-webkit-progress-value {
+  @apply float-start inline-block bg-primary-500 ps-0;
+}
+
+/* Apexcharts styles */
+.apexcharts-canvas .apexcharts-svg {
+  background: transparent !important;
+}
+.dark .apexcharts-canvas svg text {
+  fill: white !important;
+}
+.dark .apexcharts-canvas .apexcharts-legend-text {
+  color: white !important;
+  fill: white !important;
+}
+.apexcharts-tooltip {
+  @apply border border-gray-200 bg-white shadow-none;
+}
+.dark .apexcharts-tooltip {
+  @apply border-gray-700! bg-gray-800!;
+}
+.apexcharts-gridline {
+  @apply opacity-80;
+}
+.dark .apexcharts-gridline {
+  @apply opacity-20;
+}
+.apexcharts-tooltip-title {
+  @apply border-b border-gray-200 bg-gray-100 text-center text-sm font-bold;
+}
+.dark .apexcharts-tooltip-title {
+  @apply border-gray-700! bg-gray-900!;
+}
+.apexcharts-tooltip-text {
+  @apply w-full leading-none;
+}
+.apexcharts-legend-series {
+  @apply flex items-center gap-1;
+}
+.apexcharts-tooltip-y-group {
+  @apply flex justify-between gap-3;
+}
+.apexcharts-tooltip-marker {
+  @apply h-5 w-5;
+}
+
+/* Date Input Styles */
+#month.dp__input {
+  @apply text-center;
+}
+.xborder #month.dp__input {
+  @apply w-auto border-0;
+}
+.xborder #month.dp__input.dp__input_focus {
+  @apply border-0 font-bold ring-0 outline-0;
+}
+.dp__input {
+  border-radius: 0.375rem !important;
+  /* padding: 0.5rem 1.75rem 0.5rem 0.75rem !important; */
+  @apply block w-full rounded-md border-gray-200 bg-white px-4! py-2! shadow-xs dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300;
+}
+.dp__input.dp__input_focus {
+  @apply border-primary-500 ring-1 ring-primary-500 dark:border-primary-600 dark:ring-primary-600;
+}
+.dp__input:hover:not(.dp__input_focus) {
+  @apply border-gray-300 dark:border-gray-700;
+}
+.dp__menu,
+.dp__overlay,
+.dp__arrow_top,
+.dp__button:hover,
+.dp__arrow_bottom {
+  @apply rounded-md border-gray-200 bg-white text-gray-700 shadow-lg dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300;
+}
+.dp__overlay_cell:hover,
+.dp__inc_dec_button:hover,
+.dp__time_display:hover:enabled,
+.dp__calendar_header_separator {
+  @apply bg-gray-200 dark:bg-gray-700;
+}
+.dp__time_display,
+.dp__overlay_cell:hover,
+.dp__btn {
+  @apply text-gray-700 dark:text-gray-300;
+}
+.dp--year-select,
+.dp__month_year_select,
+.dp__date_hover_end,
+.dp__date_hover_start,
+.dp__date_hover,
+.dp__btn .dp__inner_nav {
+  @apply text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700;
+}
+.dp__calendar_header,
+.dp__calendar_item {
+  @apply text-sm text-gray-700 dark:text-gray-300;
+}
+.dp__action_button {
+  @apply rounded-md bg-primary-600 p-4 text-sm font-medium uppercase dark:bg-primary-600;
+}
+.dp__action_cancel {
+  @apply rounded-md bg-gray-100 p-4 text-sm font-medium uppercase dark:bg-gray-700;
+}
+.dp__cell_offset {
+  @apply text-gray-400 dark:text-gray-600;
+}
+.dp__arrow_top {
+  @apply rounded-none;
+}
+.dp__menu,
+.dp__overlay,
+.dp__arrow_top,
+.dp__button:hover,
+.dp__arrow_bottom {
+  @apply shadow-none;
+}
+#dp-input-month {
+  @apply border-0 text-center font-bold;
+}
+
+/* Daily Sales Report Calendar */
+.calendar {
+  @apply relative flex w-full flex-col bg-white px-4 pt-2 pb-5 dark:bg-gray-900;
+}
+.days {
+  @apply grid grid-cols-7 overflow-hidden border-t border-l border-gray-200 dark:border-gray-700;
+}
+.day-label {
+  @apply -mt-px -ml-px border border-gray-200 p-2 text-center font-bold uppercase dark:border-gray-700;
+}
+.day {
+  @apply -mt-px -ml-px border border-gray-200 p-2 dark:border-gray-700;
+}
+.day.dull {
+  @apply text-gray-400 dark:text-gray-600;
+}
+.day.today {
+  @apply text-primary-600 dark:text-primary-400;
+}
+.day.dull.today {
+  @apply text-gray-500 dark:text-gray-600;
+}
+.amount {
+  @apply mt-1 cursor-default bg-gray-100 px-2 py-1 text-end dark:bg-gray-800;
+}
+.amount.data {
+  @apply cursor-pointer;
+}
+.day.dull .amount {
+  @apply hidden;
+}
+
+/* Monthly Sales Calendar */
+.calendar {
+  @apply relative flex w-full flex-col rounded-b-lg bg-white px-4 pt-2 pb-5 dark:bg-gray-900;
+}
+.months {
+  @apply grid grid-cols-6 overflow-hidden border-t border-l border-gray-200 dark:border-gray-700;
+}
+.month {
+  @apply -mt-px -ml-px border border-gray-200 p-2 capitalize dark:border-gray-700;
+}
+.amount {
+  @apply mt-1 cursor-default rounded-md bg-gray-100 px-2 py-1 text-end dark:bg-gray-800;
+}
+.amount.data {
+  @apply cursor-pointer;
+}
+.month.current-month {
+  @apply text-primary-600 dark:text-primary-400;
+}
+
+/* Time Picker */
+
+.vue__time-picker {
+  position: relative;
+  width: 100%;
+  vertical-align: middle;
+}
+
+.vue__time-picker * {
+  box-sizing: border-box;
+}
+
+.vue__time-picker input.has-custom-icon {
+  padding-left: 1.8em;
+}
+
+.vue__time-picker input.display-time.invalid:not(.skip-error-style) {
+  border-color: #cc0033;
+  outline-color: #cc0033;
+}
+
+.vue__time-picker input.display-time:disabled,
+.vue__time-picker input.display-time.disabled {
+  @apply cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600;
+}
+
+.vue__time-picker .controls {
+  position: absolute;
+  top: 100%;
+  bottom: 0;
+  right: 0;
+  z-index: 3;
+
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  align-items: stretch;
+
+  /* Prevent browser focusing on the controls layer */
+  pointer-events: none;
+}
+
+.vue__time-picker .controls > * {
+  cursor: pointer;
+
+  width: auto;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+
+  padding: 0 0.35em;
+
+  color: #d2d2d2;
+  line-height: 100%;
+  font-style: normal;
+
+  /* Resume pointer-events on children components */
+  pointer-events: initial;
+
+  transition:
+    color 0.2s,
+    opacity 0.2s;
+}
+
+.vue__time-picker .controls > *:hover {
+  color: #797979;
+}
+
+.vue__time-picker .controls > *:focus,
+.vue__time-picker .controls > *:active {
+  outline: 0;
+}
+
+.vue__time-picker .controls .char {
+  font-size: 1.1em;
+  line-height: 100%;
+
+  /* Vertical align fixes for webkit browsers only */
+  -webkit-margin-before: -0.15em;
+}
+
+.vue__time-picker .custom-icon {
+  z-index: 2;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1.8em;
+
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+
+  /* pass down mouse events to the <input> underneath */
+  pointer-events: none;
+}
+
+.vue__time-picker .custom-icon img,
+.vue__time-picker .custom-icon svg,
+.vue__time-picker .controls img,
+.vue__time-picker .controls svg {
+  @apply size-5;
+}
+
+.vue__time-picker .time-picker-overlay {
+  @apply fixed inset-0 z-10;
+}
+
+.vue__time-picker .dropdown,
+.vue__time-picker-dropdown {
+  @apply absolute start-0 top-full z-10 mt-1 h-40 w-full rounded-md border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800;
+}
+
+/* Dropdown class when "append-to-body" is on */
+.vue__time-picker-dropdown {
+  @apply fixed z-50;
+}
+
+.vue__time-picker .dropdown.drop-up,
+.vue__time-picker-dropdown.drop-up {
+  @apply top-auto bottom-full mb-1;
+}
+
+.vue__time-picker .dropdown .select-list,
+.vue__time-picker-dropdown .select-list {
+  @apply flex h-40 w-full items-stretch justify-between overflow-hidden;
+}
+
+.vue__time-picker .dropdown .select-list:focus,
+.vue__time-picker .dropdown .select-list:active,
+.vue__time-picker-dropdown .select-list:focus,
+.vue__time-picker-dropdown .select-list:active {
+  @apply outline-none;
+}
+
+/* =====================================================
+   Mobile-Friendly Improvements (Somali Business Users)
+   ===================================================== */
+
+/* Minimum touch targets — 44px for fingers */
+button,
+[role='button'],
+a.btn,
+.btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Exception for icon-only inline actions in tables */
+table button,
+table [role='button'] {
+  min-height: 32px;
+  min-width: 32px;
+}
+
+/* Horizontal scroll for data tables on small screens */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* Form grids stack to single column on mobile */
+@media (max-width: 640px) {
+  .grid.grid-cols-2,
+  .grid.grid-cols-3,
+  .grid.grid-cols-4 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  /* Modals take full screen width on mobile */
+  .modal-content {
+    @apply mx-2 max-h-[90dvh] overflow-y-auto;
+  }
+
+  /* Compact header on mobile */
+  header h1 {
+    @apply text-lg;
+  }
+
+  /* Smaller pagination on mobile */
+  nav[aria-label='pagination'] span,
+  nav[aria-label='pagination'] a {
+    @apply px-2 py-1 text-xs;
+  }
+}
+
+/* iOS safe-area insets for bottom nav/tab bars */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Sticky table header for mobile scrolling */
+@media (max-width: 768px) {
+  .sticky-header thead th {
+    @apply sticky top-0 z-10 bg-gray-50 dark:bg-gray-800;
+  }
+}
+
+/* Better tap highlight removal for interactive elements */
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent text size adjustment on orientation change (iOS) */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Smooth scrolling for SPA navigation */
+html {
+  scroll-behavior: smooth;
+}
+
+.vue__time-picker .dropdown ul,
+.vue__time-picker-dropdown ul {
+  flex: 1 1 0.00001px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.vue__time-picker .dropdown ul.minutes,
+.vue__time-picker .dropdown ul.seconds,
+.vue__time-picker .dropdown ul.apms,
+.vue__time-picker-dropdown ul.minutes,
+.vue__time-picker-dropdown ul.seconds,
+.vue__time-picker-dropdown ul.apms {
+  @apply border-l border-gray-300 dark:border-gray-700;
+}
+
+.vue__time-picker .dropdown ul li,
+.vue__time-picker-dropdown ul li {
+  @apply py-1 text-center text-gray-800 dark:text-gray-300;
+}
+
+/* .vue__time-picker .dropdown ul li:not(.hint):not([disabled]):hover,
+.vue__time-picker .dropdown ul li:not(.hint):not([disabled]):focus,
+.vue__time-picker-dropdown ul li:not(.hint):not([disabled]):hover,
+.vue__time-picker-dropdown ul li:not(.hint):not([disabled]):focus {
+  @apply bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100;
+}
+
+.vue__time-picker .dropdown ul li:not([disabled]).active,
+.vue__time-picker .dropdown ul li:not([disabled]).active:hover,
+.vue__time-picker .dropdown ul li:not([disabled]).active:focus,
+.vue__time-picker-dropdown ul li:not([disabled]).active,
+.vue__time-picker-dropdown ul li:not([disabled]).active:hover,
+.vue__time-picker-dropdown ul li:not([disabled]).active:focus {
+  @apply bg-primary-500 text-white dark:bg-primary-600;
+} */
+
+/* .vue__time-picker .dropdown ul li[disabled],
+.vue__time-picker .dropdown ul li[disabled]:hover,
+.vue__time-picker-dropdown ul li[disabled],
+.vue__time-picker-dropdown ul li[disabled]:hover {
+  @apply cursor-not-allowed bg-transparent opacity-30;
+} */
+
+.vue__time-picker .dropdown .hint,
+.vue__time-picker-dropdown .hint {
+  @apply text-sm text-gray-500 dark:text-gray-600;
+}
+
+/* Support HTML */
+.html h1 {
+  @apply mt-6 mb-3 text-2xl font-extrabold;
+}
+.html h2 {
+  @apply mt-6 mb-3 text-xl font-extrabold;
+}
+.html h3 {
+  @apply mt-6 mb-3 text-lg font-bold;
+}
+.html h4 {
+  @apply mt-2 mb-3 font-bold;
+}
+.html h5,
+.html h6 {
+  @apply mt-1 mb-2 text-sm font-extrabold;
+}
+.html p {
+  @apply mb-2;
+}
+.html p:last-child {
+  @apply mb-0;
+}
+.html a {
+  @apply text-primary-700 underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out dark:text-primary-300 dark:decoration-neutral-500;
+}
+.html a:hover {
+  @apply text-primary-900 decoration-current hover:text-primary-100;
+}
+.html pre,
+.html code {
+  tab-size: 2;
+  @apply max-w-full rounded font-mono text-sm whitespace-pre-wrap select-text dark:border-neutral-950 dark:bg-neutral-800;
+}
+.html pre {
+  @apply my-4 border;
+}
+.html pre > code {
+  @apply my-2 block border-0 px-4 py-3;
+}
+.html *:not(pre) > code {
+  padding: 1px 4px;
+  word-break: break-word;
+  @apply border bg-neutral-50/50 text-red-500 dark:bg-neutral-800/50 dark:text-red-300;
+}
+.html hr {
+  @apply my-2 border-b;
+}
+.html blockquote {
+  @apply my-2 rounded border-l-4 border-neutral-400 bg-neutral-200 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-950;
+}
+.html ul {
+  @apply my-2 list-outside list-disc ps-6;
+}
+.html ol {
+  @apply my-2 list-outside list-decimal ps-6;
+}
+.html *:not(button):first-child {
+  @apply mt-0;
+}
+.html *:not(button):last-child {
+  @apply mb-0;
+}
+.html * {
+  word-break: break-word;
+}
+
+.print\:exact {
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+/* Print styles */
+@media print {
+  * {
+    @apply overflow-visible border-gray-300 bg-white whitespace-normal text-black!;
+  }
+  body .main-contents {
+    @apply p-0;
+  }
+  .top-bar,
+  .side-bar,
+  .top-bar-con,
+  main header .z-1,
+  .modal-open main,
+  #demo-reset-banner,
+  .modal-open #listing,
+  .modal-open #app div:first-child {
+    @apply hidden;
+  }
+  scroll-region,
+  .print\:h-full {
+    height: 100%;
+  }
+  .fixed-actions th:last-child,
+  .fixed-actions td:last-child,
+  .fixed-selection tr th:first-child,
+  .fixed-selection tr td:first-child {
+    @apply hidden;
+  }
+
+  table th,
+  table td {
+    @apply border-gray-500! py-1!;
+  }
+  .rounded-corners {
+    @apply rounded-none;
+  }
+  .print-exact {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .print-exact div {
+    @apply bg-transparent;
+  }
+}

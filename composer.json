@@ -1,0 +1,130 @@
+{
+    "name": "laravel/laravel",
+    "type": "project",
+    "version": "4.0.0-rc.6",
+    "description": "The skeleton application for the Laravel framework.",
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "academe/omnipay-authorizenetapi": " ~3.0",
+        "aws/aws-sdk-php": "^3.326",
+        "giggsey/libphonenumber-for-php": "^8.13",
+        "inertiajs/inertia-laravel": "^3.0.0-beta",
+        "klsheng/myinvois-php-sdk": "^1.0",
+        "laravel-notification-channels/telegram": "^7.0",
+        "laravel-notification-channels/twilio": "^4.2",
+        "laravel/framework": "^13.0",
+        "laravel/jetstream": "^5.1",
+        "laravel/mcp": "^0.5.2",
+        "laravel/pennant": "^1.15",
+        "laravel/sanctum": "^4.0",
+        "laravel/tinker": "^3.0",
+        "league/omnipay": "^3",
+        "livewire/livewire": "^4.0",
+        "maatwebsite/excel": "^3.1",
+        "mailersend/laravel-driver": "^3.1",
+        "moneyphp/money": "^4.5",
+        "nnjeim/world": "^1.1",
+        "omnipay/paypal": "^3.0",
+        "omnipay/stripe": "^3.2",
+        "resend/resend-php": "^0.14.0",
+        "robinvdvleuten/ulid": "^5.0",
+        "saleh7/php-zatca-xml": "^2.2",
+        "spatie/laravel-activitylog": "^4.8",
+        "spatie/laravel-backup": "^10.0",
+        "spatie/laravel-permission": "^7.2",
+        "spatie/laravel-schemaless-attributes": "^2.5",
+        "spatie/laravel-sluggable": "^3.6",
+        "symfony/http-client": "^7.1",
+        "symfony/mailgun-mailer": "^7.1",
+        "symfony/postmark-mailer": "^7.1",
+        "tecdiary/installer": "^0.1.0",
+        "tecdiary/laravel-attachments": "^1.1",
+        "tecdiary/laravel-captcha": "^1.0",
+        "tightenco/ziggy": "^2.0"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.23",
+        "laravel-lang/lang": "^15.11",
+        "laravel-lang/publisher": "^16.4",
+        "laravel/boost": "^2.0",
+        "laravel/pint": "^1.13",
+        "laravel/sail": "^1.26",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.0",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0",
+        "stichoza/google-translate-php": "^5.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Modules\\": "modules/",
+            "Plugins\\": "plugins/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        },
+        "files": [
+            "app/Tec/Helpers/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "@php artisan boost:update --ansi"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi",
+            "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+            "@php artisan migrate --graceful --ansi"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./packages/installer",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "./packages/laravel-captcha",
+            "options": {
+                "symlink": true
+            }
+        }
+    ]
+}
