@@ -39,7 +39,7 @@ ok "System updated"
 # ── 2. PHP 8.4 ───────────────────────────────────────────
 info "Installing PHP 8.4..."
 apt install -y -qq software-properties-common
-add-apt-repository ppa:ondrej/php -y -qq
+add-apt-repository ppa:ondrej/php -y
 apt update -qq
 apt install -y -qq \
     php8.4-fpm php8.4-cli php8.4-mysql php8.4-mbstring \
