@@ -63,8 +63,18 @@ ok "Nginx installed"
 info "Installing MySQL 8.0..."
 apt install -y -qq mysql-server
 systemctl enable mysql
+systemctl start mysql
 
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DB_ROOT_PASS}';"
+# Set root password — works on fresh install (auth_socket) and re-runs
+if mysql -u root -e "SELECT 1" > /dev/null 2>&1; then
+    # Fresh install: auth_socket active, no password yet
+    mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DB_ROOT_PASS}'; FLUSH PRIVILEGES;"
+else
+    # Re-run: root already has a password — use the one provided
+    mysql -u root -p"${DB_ROOT_PASS}" -e "SELECT 1" > /dev/null 2>&1 || \
+        err "Cannot connect to MySQL with that root password. Reset MySQL and retry."
+fi
+
 mysql -u root -p"${DB_ROOT_PASS}" -e "
     CREATE DATABASE IF NOT EXISTS ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_APP_PASS}';
