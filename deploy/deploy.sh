@@ -9,7 +9,7 @@ APP_DIR="/var/www/sma"
 PHP="php8.4"
 
 echo "==> Pulling latest code..."
-git pull origin main
+git pull origin master
 
 echo "==> Installing PHP dependencies (no dev)..."
 COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction
