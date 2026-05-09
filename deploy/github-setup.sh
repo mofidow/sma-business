@@ -176,7 +176,7 @@ ok "PHP dependencies installed"
 
 # ── 14. Frontend ─────────────────────────────────────────
 info "Installing & building frontend..."
-npm ci --prefer-offline
+npm install --prefer-offline
 npm run build
 ok "Frontend built"
 

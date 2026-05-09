@@ -24,7 +24,7 @@ $PHP artisan view:cache
 $PHP artisan event:cache
 
 echo "==> Installing frontend dependencies..."
-npm ci --prefer-offline
+npm install --prefer-offline
 
 echo "==> Building frontend assets..."
 npm run build
