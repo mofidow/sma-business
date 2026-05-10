@@ -62,6 +62,11 @@ class HandleInertiaRequests extends Middleware
 
         if (! $available_stores) {
             $available_stores = Store::active()->get(['id', 'name']);
+
+            // Auto-select when only one store exists and none is selected
+            if (! session('selected_store_id') && $available_stores->count() === 1) {
+                session(['selected_store_id' => $available_stores->first()->id]);
+            }
         }
 
         $langFiles = json_decode(file_get_contents(lang_path('languages.json')));
