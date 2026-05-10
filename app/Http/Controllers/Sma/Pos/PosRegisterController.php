@@ -40,12 +40,18 @@ class PosRegisterController extends Controller
 
         $form = $request->validate([
             'note'                      => 'nullable',
-            'cash_in_register'          => 'required|numeric',
-            'cash_submitted'            => 'required|numeric',
-            'cc_payments_submitted'     => 'required|numeric',
-            'stripe_payments_submitted' => 'required|numeric',
-            'other_payments_submitted'  => 'required|numeric',
+            'cash_in_register'          => 'nullable|numeric',
+            'cash_submitted'            => 'nullable|numeric',
+            'cc_payments_submitted'     => 'nullable|numeric',
+            'stripe_payments_submitted' => 'nullable|numeric',
+            'other_payments_submitted'  => 'nullable|numeric',
         ]);
+
+        $form['cash_in_register']          = $form['cash_in_register'] ?? 0;
+        $form['cash_submitted']            = $form['cash_submitted'] ?? 0;
+        $form['cc_payments_submitted']     = $form['cc_payments_submitted'] ?? 0;
+        $form['stripe_payments_submitted'] = $form['stripe_payments_submitted'] ?? 0;
+        $form['other_payments_submitted']  = $form['other_payments_submitted'] ?? 0;
 
         if (! $register?->id) {
             $register = $request->user()->openedRegister()->without('store')->first();
