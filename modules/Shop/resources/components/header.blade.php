@@ -1,4 +1,4 @@
-<header class="bg-gray-50 dark:bg-gray-950 tracking-normal print:hidden" x-data="{
+<header class="bg-white tracking-normal print:hidden border-b border-gray-100 shadow-sm sticky top-0 z-40" x-data="{
     mobileMenu: false,
     categoriesMenu: false,
     brandsMenu: false,
@@ -22,8 +22,8 @@
 }">
 
   @if ($shop_header_settings['notification']['message'] ?? null)
-    <div class="bg-black dark:bg-white text-white dark:text-black">
-      <div class="mx-auto max-w-7xl py-2 md:flex md:items-center md:justify-center px-4 sm:px-6 lg:px-8 text-sm/5 text-center">
+    <div class="bg-gradient-to-r from-violet-600 to-indigo-600 text-white">
+      <div class="mx-auto max-w-7xl py-2.5 md:flex md:items-center md:justify-center px-4 sm:px-6 lg:px-8 text-sm/5 text-center">
         {{ $shop_header_settings['notification']['message'] }}
         @if (($shop_header_settings['notification']['button_text'] ?? null) && ($shop_header_settings['notification']['button_link'] ?? null))
           <a href="{{ $shop_header_settings['notification']['button_link'] }}"
@@ -47,7 +47,7 @@
         x-transition:enter-start="ltr:-translate-x-full rtl:translate-x-full" x-transition:enter-end="translate-x-0"
         x-transition:leave="transition ease-in-out duration-300 transform" x-transition:leave-start="translate-x-0"
         x-transition:leave-end="ltr:-translate-x-full rtl:translate-x-full"
-        class="relative flex w-full max-w-xs flex-col overflow-y-auto bg-white dark:bg-gray-950 pb-4 shadow-xl">
+        class="relative flex w-full max-w-xs flex-col overflow-y-auto bg-white pb-4 shadow-2xl">
         <div class="flex justify-between gap-x-6 px-4 pb-2 py-5">
           <a href="{{ route('shop.home') }}" class="text-white x-focus max-w-48">
             @if (demo())
@@ -167,7 +167,7 @@
         x-transition:enter-start="ltr:translate-x-full rtl:-translate-x-full" x-transition:enter-end="translate-x-0"
         x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700" x-transition:leave-start="translate-x-0"
         x-transition:leave-end="ltr:translate-x-full rtl:-translate-x-full" class="h-full w-full">
-        <div class="h-full min-h-screen bg-white dark:bg-black shadow-lg">
+        <div class="h-full min-h-screen bg-white shadow-xl">
           <div class="flex items-start justify-between p-6 border-b border-gray-200 dark:border-gray-700">
             <a href="{{ route('shop.cart') }}" wire:navigate w.hover class="group flex items-center gap-2 x-focus">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
@@ -207,7 +207,7 @@
         x-transition:enter-start="ltr:-translate-x-full rtl:translate-x-full" x-transition:enter-end="translate-x-0"
         x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700" x-transition:leave-start="translate-x-0"
         x-transition:leave-end="ltr:-translate-x-full rtl:translate-x-full" class="h-full w-full">
-        <div class="h-full flex flex-col bg-white dark:bg-gray-950 shadow-lg">
+        <div class="h-full flex flex-col bg-white shadow-2xl">
           <!-- Close Button -->
           <div class="absolute end-0 top-0 me-3 mt-3">
             <button type="button" @click="categoriesMenu = false"
@@ -376,7 +376,7 @@
   </div>
 
   <!-- Top navigation -->
-  <div class="bg-gray-900 text-gray-200 hidden sm:block lg:hidden">
+  <div class="bg-gray-50 text-gray-600 border-b border-gray-100 hidden sm:block lg:hidden">
     <div class="mx-auto flex h-10 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
       @if (($shop_header_settings['general']['phone'] ?? null) && ($shop_header_settings['general']['email'] ?? null))
         <div class="flex items-center gap-x-4 text-sm">
@@ -413,7 +413,7 @@
           <div x-data="{ open: false }" x-on:click.stop.outside="open = false" class="relative z-30">
 
             <button @click="open = ! open"
-              class="relative flex items-center whitespace-nowrap justify-center gap-2 py-1 px-2.5 rounded-full text-white text-sm hover:bg-gray-800/10">
+              class="relative flex items-center whitespace-nowrap justify-center gap-2 py-1 px-2.5 rounded-full text-gray-700 text-sm hover:bg-gray-100">
               <span class="sr-only">{{ __('User Menu') }}</span>
               {{ auth()->user()->name }}
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -471,12 +471,12 @@
             {{-- <button type="button" @click="showLogin()" class="text-sm font-medium text-white hover:text-gray-100">
               {{ __('Sign in') }}
             </button> --}}
-            <a href="{{ route('shop.signin') }}" wire:navigate w.hover class="text-sm font-medium text-white hover:text-gray-100">
+            <a href="{{ route('shop.signin') }}" wire:navigate w.hover class="text-sm font-medium text-gray-600 hover:text-violet-600 transition-colors">
               {{ __('Sign in') }}
             </a>
             @if ($shop_header_settings['general']['user_registration'] ?? false)
               <a href="{{ route('shop.signup') }}" wire:navigate w.hover
-                class="text-sm font-medium text-white hover:text-gray-100">{{ __('Sign up') }}</a>
+                class="text-sm font-medium text-gray-600 hover:text-violet-600 transition-colors">{{ __('Sign up') }}</a>
             @endif
           </div>
         @endauth
@@ -706,7 +706,7 @@
 
 
   <!-- Navigation -->
-  <div class="relative z-10 border-y border-gray-200 dark:border-gray-800 hidden md:block">
+  <div class="relative z-10 border-t border-gray-100 bg-white hidden md:block">
     <nav aria-label="Top">
       <!-- Menus navigation -->
       <div>
@@ -981,7 +981,7 @@
           </div>
 
           <div x-show="brandsMenu" style="display: none" @click.away="brandsMenu = false"
-            class="absolute inset-x-0 top-0 -z-10 bg-white dark:bg-gray-950 pt-12 shadow-lg ring-1 ring-gray-900/5 dark:ring-gray-800"
+            class="absolute inset-x-0 top-0 -z-10 bg-white pt-12 shadow-xl ring-1 ring-gray-900/5"
             x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1"
             x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-out duration-200"
             x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1">
@@ -1039,7 +1039,7 @@
 
           {{-- Recent Products --}}
           <div x-show="recentMenu" style="display: none" @click.away="recentMenu = false"
-            class="absolute inset-x-0 top-0 -z-10 bg-white dark:bg-gray-950 pt-12 shadow-lg ring-1 ring-gray-900/5 dark:ring-gray-800"
+            class="absolute inset-x-0 top-0 -z-10 bg-white pt-12 shadow-xl ring-1 ring-gray-900/5"
             x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1"
             x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-out duration-200"
             x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1">

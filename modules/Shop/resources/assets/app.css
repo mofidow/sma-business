@@ -35,17 +35,17 @@
   --color-negative-900: var(--color-red-900);
   --color-negative-950: var(--color-red-950);
 
-  --color-primary-50: var(--color-blue-50);
-  --color-primary-100: var(--color-blue-100);
-  --color-primary-200: var(--color-blue-200);
-  --color-primary-300: var(--color-blue-300);
-  --color-primary-400: var(--color-blue-400);
-  --color-primary-500: var(--color-blue-500);
-  --color-primary-600: var(--color-blue-600);
-  --color-primary-700: var(--color-blue-700);
-  --color-primary-800: var(--color-blue-800);
-  --color-primary-900: var(--color-blue-900);
-  --color-primary-950: var(--color-blue-950);
+  --color-primary-50: var(--color-violet-50);
+  --color-primary-100: var(--color-violet-100);
+  --color-primary-200: var(--color-violet-200);
+  --color-primary-300: var(--color-violet-300);
+  --color-primary-400: var(--color-violet-400);
+  --color-primary-500: var(--color-violet-500);
+  --color-primary-600: var(--color-violet-600);
+  --color-primary-700: var(--color-violet-700);
+  --color-primary-800: var(--color-violet-800);
+  --color-primary-900: var(--color-violet-900);
+  --color-primary-950: var(--color-violet-950);
 
   --color-positive-50: var(--color-green-50);
   --color-positive-100: var(--color-green-100);
@@ -105,6 +105,10 @@
   }
   body {
     @apply h-full w-full bg-white font-sans text-gray-700 antialiased dark:bg-gray-950 dark:text-gray-300;
+    font-feature-settings: 'kern', 'liga', 'clig', 'calt';
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight;
   }
 }
 
@@ -140,13 +144,13 @@ button {
   @apply cursor-pointer;
 }
 .btn-primary {
-  @apply relative inline-flex items-center rounded-md border border-transparent bg-gray-950 px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase transition duration-150 ease-in-out hover:bg-gray-800 hover:ring-2 hover:ring-black hover:ring-offset-2 hover:ring-offset-white hover:outline-none focus:bg-gray-700 active:bg-gray-900 disabled:opacity-50 dark:bg-white dark:text-gray-800 dark:hover:bg-gray-100 dark:hover:ring-white dark:hover:ring-offset-black dark:focus:bg-white dark:active:bg-gray-300;
+  @apply relative inline-flex items-center justify-center gap-1.5 rounded-lg border border-transparent bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 ease-in-out hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 active:bg-gray-800 disabled:opacity-50 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 dark:focus:ring-white dark:focus:ring-offset-gray-950;
 }
 .btn-primary.btn-md {
   @apply px-5 py-2.5 text-sm;
 }
 .btn-primary.btn-lg {
-  @apply px-6 py-3 text-base;
+  @apply px-7 py-3 text-base;
 }
 
 .btn-danger {
@@ -787,6 +791,35 @@ span.flatpickr-day.nextMonthDay.selected {
 }
 .hasWeeks .flatpickr-days {
   @apply border-r-0;
+}
+
+/* ── Marketplace cards ─────────────────────────────────────────────── */
+.product-card {
+  @apply group relative flex flex-col bg-white rounded-2xl overflow-hidden ring-1 ring-gray-100 hover:ring-gray-200 hover:shadow-lg transition-all duration-300;
+}
+.product-card-image {
+  @apply relative overflow-hidden bg-gray-50 aspect-square;
+}
+.product-card-image img {
+  @apply w-full h-full object-cover transition-transform duration-500 group-hover:scale-105;
+}
+.product-card-body {
+  @apply p-4 flex flex-col gap-1 flex-1;
+}
+.section-title {
+  @apply text-2xl font-bold text-gray-900 tracking-tight;
+}
+.section-subtitle {
+  @apply text-sm text-gray-500 mt-1;
+}
+.badge-promo {
+  @apply absolute z-10 top-3 end-3 bg-violet-600 text-white text-xs font-semibold px-2 py-1 rounded-full;
+}
+.category-card {
+  @apply flex flex-col items-center gap-3 p-5 bg-white rounded-2xl ring-1 ring-gray-100 hover:ring-violet-200 hover:shadow-md transition-all duration-200 cursor-pointer;
+}
+.trust-badge {
+  @apply flex items-start gap-4 p-6 rounded-2xl bg-gray-50;
 }
 @media screen and (min-width: 0) and (min-resolution: +72dpi) {
   span.flatpickr-day {

@@ -1,4 +1,4 @@
-<footer aria-labelledby="footer-heading" class="bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 print:hidden">
+<footer aria-labelledby="footer-heading" class="bg-gray-900 text-gray-300 border-t border-gray-800 print:hidden">
   <h2 id="footer-heading" class="sr-only">Footer</h2>
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     <div @class([
@@ -10,12 +10,12 @@
         <div class="space-y-12 grid grid-cols-2 md:grid-cols-4 gap-8 md:space-y-0">
           @forelse ($shop_footer_settings['shop_footer']['sections'] ?? [] as $section)
             <div>
-              <h3 class="text-sm font-medium text-prominent">{{ $section['title'] ?? '' }}</h3>
+              <h3 class="text-sm font-semibold text-white">{{ $section['title'] ?? '' }}</h3>
               <ul role="list" class="mt-6 space-y-4">
                 @forelse ($section['menus'] as $menu)
                   <li class="text-sm">
                     <a href="{{ $menu['link'] }}"
-                      class="group text-mute inline-flex items-center gap-x-1 x-focus link transition-all ease-in">
+                      class="group text-gray-400 hover:text-white inline-flex items-center gap-x-1 x-focus transition-all ease-in text-sm">
                       {{ $menu['label'] }}
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         class="size-3.5 opacity-0 group-hover:opacity-100 ltr:ms-0 ltr:group-hover:ms-2 rtl:me-0 rtl:group-hover:me-2 rtl:rotate-180 transition-all ease-in">
@@ -44,7 +44,7 @@
     {{-- <div class="border-t border-gray-200 dark:border-gray-700 py-10">
       <p class="text-sm text-mute">Copyright &copy; 2021 Your Company, Inc.</p>
     </div> --}}
-    <div class="mt-12 border-t border-white/10 py-10 md:flex md:items-center md:justify-between">
+    <div class="mt-12 border-t border-gray-800 py-10 md:flex md:items-center md:justify-between">
       @if ($shop_footer_settings['social_links'] ?? [])
         <div class="flex gap-x-6 md:order-2">
           @if ($shop_footer_settings['social_links']['facebook'] ?? [])
@@ -108,9 +108,7 @@
           @endif
         </div>
       @endif
-      <p class="mt-8 text-sm/6 text-gray-400 md:order-1 md:mt-0">&copy; {{ date('Y') }} {{ $shop_footer_settings['name'] ?? '' }}. All
-        rights
-        reserved.</p>
+      <p class="mt-8 text-sm text-gray-500 md:order-1 md:mt-0">&copy; {{ date('Y') }} {{ $shop_footer_settings['name'] ?? config('app.name') }}. {{ __('All rights reserved.') }}</p>
     </div>
   </div>
   </div>
