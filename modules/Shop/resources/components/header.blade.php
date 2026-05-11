@@ -49,13 +49,12 @@
         x-transition:leave-end="ltr:-translate-x-full rtl:translate-x-full"
         class="relative flex w-full max-w-xs flex-col overflow-y-auto bg-white pb-4 shadow-2xl">
         <div class="flex justify-between gap-x-6 px-4 pb-2 py-5">
-          <a href="{{ route('shop.home') }}" class="text-white x-focus max-w-48">
-            @if (demo())
-              <img src="/img/sma-icon.svg" alt="Logo" class="h-8 w-auto dark:invert">
+          <a href="{{ route('shop.home') }}" class="x-focus max-w-48">
+            @php $customLogo = $shop_header_settings['logo'] ?? null; $isDefault = !$customLogo || str_contains($customLogo, 'sma-icon'); @endphp
+            @if ($isDefault)
+              <span class="text-xl font-bold tracking-tight text-gray-900">{{ $shop_header_settings['general']['name'] ?? config('app.name') }}</span>
             @else
-              <img src="{{ $shop_header_settings['logo'] ?? '/img/sma-icon.svg' }}" alt="Logo" class="h-8 w-auto dark:hidden">
-              <img src="{{ $shop_header_settings['logo_dark'] ?? '/img/sma-icon.svg' }}" alt="Logo"
-                class="h-8 w-auto hidden dark:block">
+              <img src="{{ $customLogo }}" alt="{{ $shop_header_settings['general']['name'] ?? config('app.name') }}" class="h-8 w-auto">
             @endif
           </a>
           <button type="button" @click="mobileMenu = false"
@@ -497,13 +496,11 @@
 
       <div class="flex items-center gap-4">
         <div class="max-w-40 lg:max-w-56 grow-0">
-          <a href="{{ route('shop.home') }}" class="text-white x-focus">
-            @if (demo())
-              <img src="/img/sma-icon.svg" alt="Logo" class="h-8 w-auto dark:invert">
+          <a href="{{ route('shop.home') }}" class="x-focus">
+            @if ($isDefault)
+              <span class="text-xl font-bold tracking-tight text-gray-900">{{ $shop_header_settings['general']['name'] ?? config('app.name') }}</span>
             @else
-              <img src="{{ $shop_header_settings['logo'] ?? '/img/sma-icon.svg' }}" alt="Logo" class="h-8 w-auto dark:hidden">
-              <img src="{{ $shop_header_settings['logo_dark'] ?? '/img/sma-icon.svg' }}" alt="Logo"
-                class="h-8 w-auto hidden dark:block">
+              <img src="{{ $customLogo }}" alt="{{ $shop_header_settings['general']['name'] ?? config('app.name') }}" class="h-8 w-auto">
             @endif
           </a>
         </div>

@@ -69,16 +69,6 @@ class Settings extends Component
         }
         Storage::disk('asset')->deleteDirectory('temp');
 
-        if (demo()) {
-            $this->settings['general']['name'] = 'SMA Shop';
-            $this->settings['general']['logo'] = '/img/sma-icon.svg';
-            $this->settings['general']['logo_dark'] = '/img/sma-icon-light.svg';
-            $this->dispatch('notify',
-                type: 'error',
-                content: __('Changes are not allowed in demo mode.'),
-            );
-        }
-
         $json = json_settings_fields();
         foreach ($this->settings as $key => $value) {
             Setting::updateOrCreate(['tec_key' => $key], ['tec_value' => in_array($key, $json) ? json_encode($value ?? '') : $value]);
