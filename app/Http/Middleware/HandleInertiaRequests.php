@@ -69,7 +69,10 @@ class HandleInertiaRequests extends Middleware
             }
         }
 
-        $langFiles = json_decode(file_get_contents(lang_path('languages.json')));
+        $langJsonPath = file_exists(lang_path('languages.json'))
+            ? lang_path('languages.json')
+            : base_path('lang/languages.json');
+        $langFiles = json_decode(file_exists($langJsonPath) ? file_get_contents($langJsonPath) : '{"available":[]}');
 
         return array_merge(parent::share($request), [
             'demo'             => demo(),
