@@ -35,6 +35,13 @@ class SaveSale
             $attachments = $data['attachments'] ?? [];
             unset($data['attachments'], $data['items'], $data['taxes'], $data['payments']);
 
+            // OrderCalculator outputs item-level naming; parent table uses different names
+            $data['sub_total']      = $data['subtotal'] ?? $data['sub_total'] ?? 0;
+            $data['total_tax']      = $data['total_tax_amount'] ?? $data['total_tax'] ?? 0;
+            $data['total_discount'] = $data['total_discount_amount'] ?? $data['total_discount'] ?? 0;
+            unset($data['subtotal'], $data['total_tax_amount'], $data['total_discount_amount'],
+                  $data['total'], $data['total_items'], $data['total_quantity'], $data['total_cost']);
+
             $sale->fill($data)->save();
             $sale->taxes()->sync($taxes);
 

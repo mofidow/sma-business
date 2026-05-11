@@ -22,6 +22,13 @@ class SaveQuotation
             $attachments = $data['attachments'] ?? [];
             unset($data['attachments'], $data['items'], $data['total_cost']);
 
+            // OrderCalculator outputs item-level naming; parent table uses different names
+            $data['sub_total']      = $data['subtotal'] ?? $data['sub_total'] ?? 0;
+            $data['total_tax']      = $data['total_tax_amount'] ?? $data['total_tax'] ?? 0;
+            $data['total_discount'] = $data['total_discount_amount'] ?? $data['total_discount'] ?? 0;
+            unset($data['subtotal'], $data['total_tax_amount'], $data['total_discount_amount'],
+                  $data['total'], $data['total_items'], $data['total_quantity']);
+
             $quotation->fill($data)->save();
 
             foreach ($items as $item) {
