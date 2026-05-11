@@ -21,17 +21,17 @@ class DemoProductSeeder extends Seeder
         // ── Units ──────────────────────────────────────────────────────────
         $units = [];
         foreach ([
-            ['name' => 'Piece',    'code' => 'PC',  'operator' => '*', 'operation_value' => 1],
-            ['name' => 'Kilogram', 'code' => 'KG',  'operator' => '*', 'operation_value' => 1],
-            ['name' => 'Litre',    'code' => 'L',   'operator' => '*', 'operation_value' => 1],
-            ['name' => 'Pack',     'code' => 'PK',  'operator' => '*', 'operation_value' => 1],
-            ['name' => 'Bottle',   'code' => 'BTL', 'operator' => '*', 'operation_value' => 1],
-            ['name' => 'Box',      'code' => 'BOX', 'operator' => '*', 'operation_value' => 1],
+            ['name' => 'Piece',    'code' => 'PC',  'operator' => '*', 'operator_value' => 1],
+            ['name' => 'Kilogram', 'code' => 'KG',  'operator' => '*', 'operator_value' => 1],
+            ['name' => 'Litre',    'code' => 'L',   'operator' => '*', 'operator_value' => 1],
+            ['name' => 'Pack',     'code' => 'PK',  'operator' => '*', 'operator_value' => 1],
+            ['name' => 'Bottle',   'code' => 'BTL', 'operator' => '*', 'operator_value' => 1],
+            ['name' => 'Box',      'code' => 'BOX', 'operator' => '*', 'operator_value' => 1],
         ] as $u) {
             $existing = DB::table('units')->where('code', $u['code'])->first();
             if (! $existing) {
                 $units[$u['code']] = DB::table('units')->insertGetId(array_merge(
-                    $u, ['base_unit_id' => null, 'active' => 1, 'created_at' => $now, 'updated_at' => $now]
+                    $u, ['unit_id' => null, 'extra_attributes' => json_encode([]), 'created_at' => $now, 'updated_at' => $now]
                 ));
             } else {
                 $units[$u['code']] = $existing->id;
