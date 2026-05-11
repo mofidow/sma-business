@@ -1,4 +1,4 @@
-<footer aria-labelledby="footer-heading" class="bg-gray-900 text-gray-300 border-t border-gray-800 print:hidden">
+<footer aria-labelledby="footer-heading" class="print:hidden" style="background:#0f172a; color:#94a3b8; border-top:1px solid #1e293b;">
   <h2 id="footer-heading" class="sr-only">Footer</h2>
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     <div @class([

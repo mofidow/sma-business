@@ -13,7 +13,7 @@
     @if ($product->validPromotions->count())
       <div class="absolute top-3 end-3 flex flex-col items-end gap-1 z-10">
         @foreach ($product->validPromotions as $promotion)
-          <span class="bg-violet-600 text-white text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">
+          <span class="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap shadow-sm">
             @if ($promotion->type == 'simple')
               {{ format_number($promotion->discount, 0) }}{{ $promotion->discount_method == 'percentage' ? '%' : '' }} off
             @elseif ($promotion->type == 'advance' && $promotion->quantity_to_buy)
@@ -29,7 +29,7 @@
     {{-- Wishlist button (visible on hover) --}}
     <div class="absolute top-3 start-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
       <a href="{{ route('shop.wishlist') }}" wire:navigate w.hover
-         class="flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-md hover:bg-gray-50 text-gray-400 hover:text-violet-600 transition-colors">
+         class="flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-md hover:bg-emerald-50 text-gray-400 hover:text-emerald-600 transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
         </svg>
@@ -42,13 +42,13 @@
     {{-- Category breadcrumb --}}
     <div class="text-xs text-gray-400 truncate flex items-center gap-1">
       @if ($product->brand?->slug)
-        <a href="{{ route('shop.brand', $product->brand->slug) }}" class="hover:text-violet-600 transition-colors">
+        <a href="{{ route('shop.brand', $product->brand->slug) }}" class="hover:text-emerald-600 transition-colors">
           {{ $product->brand->name }}
         </a>
         <span class="text-gray-300">/</span>
       @endif
       @if ($product->category?->slug)
-        <a href="{{ route('shop.category', $product->category->slug) }}" class="hover:text-violet-600 transition-colors">
+        <a href="{{ route('shop.category', $product->category->slug) }}" class="hover:text-emerald-600 transition-colors">
           {{ $product->category->name }}
         </a>
       @endif
@@ -56,7 +56,7 @@
 
     {{-- Product name --}}
     <h3 class="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 flex-1">
-      <a href="{{ route('shop.product', $product->slug ?? '#') }}" wire:navigate w.hover class="hover:text-violet-600 transition-colors">
+      <a href="{{ route('shop.product', $product->slug ?? '#') }}" wire:navigate w.hover class="hover:text-emerald-600 transition-colors">
         {{ $product->name }}
       </a>
     </h3>
@@ -65,7 +65,7 @@
     <div class="flex items-center justify-between mt-1">
       <span class="text-base font-bold text-gray-900">{{ currency_value($product->price) }}</span>
       @if ($product->validPromotions->count())
-        <span class="text-xs text-violet-600 font-medium bg-violet-50 px-2 py-0.5 rounded-full">On sale</span>
+        <span class="text-xs text-amber-700 font-bold bg-amber-100 px-2 py-0.5 rounded-full">On sale</span>
       @endif
     </div>
 

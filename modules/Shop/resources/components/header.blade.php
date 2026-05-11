@@ -22,7 +22,7 @@
 }">
 
   @if ($shop_header_settings['notification']['message'] ?? null)
-    <div class="bg-gradient-to-r from-violet-600 to-indigo-600 text-white">
+    <div class="text-white" style="background:linear-gradient(90deg,#064e3b,#065f46,#0f766e)">
       <div class="mx-auto max-w-7xl py-2.5 md:flex md:items-center md:justify-center px-4 sm:px-6 lg:px-8 text-sm/5 text-center">
         {{ $shop_header_settings['notification']['message'] }}
         @if (($shop_header_settings['notification']['button_text'] ?? null) && ($shop_header_settings['notification']['button_link'] ?? null))

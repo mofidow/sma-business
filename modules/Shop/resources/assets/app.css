@@ -35,17 +35,17 @@
   --color-negative-900: var(--color-red-900);
   --color-negative-950: var(--color-red-950);
 
-  --color-primary-50: var(--color-violet-50);
-  --color-primary-100: var(--color-violet-100);
-  --color-primary-200: var(--color-violet-200);
-  --color-primary-300: var(--color-violet-300);
-  --color-primary-400: var(--color-violet-400);
-  --color-primary-500: var(--color-violet-500);
-  --color-primary-600: var(--color-violet-600);
-  --color-primary-700: var(--color-violet-700);
-  --color-primary-800: var(--color-violet-800);
-  --color-primary-900: var(--color-violet-900);
-  --color-primary-950: var(--color-violet-950);
+  --color-primary-50: var(--color-emerald-50);
+  --color-primary-100: var(--color-emerald-100);
+  --color-primary-200: var(--color-emerald-200);
+  --color-primary-300: var(--color-emerald-300);
+  --color-primary-400: var(--color-emerald-400);
+  --color-primary-500: var(--color-emerald-500);
+  --color-primary-600: var(--color-emerald-600);
+  --color-primary-700: var(--color-emerald-700);
+  --color-primary-800: var(--color-emerald-800);
+  --color-primary-900: var(--color-emerald-900);
+  --color-primary-950: var(--color-emerald-950);
 
   --color-positive-50: var(--color-green-50);
   --color-positive-100: var(--color-green-100);
@@ -795,34 +795,68 @@ span.flatpickr-day.nextMonthDay.selected {
 
 /* ── Marketplace cards ─────────────────────────────────────────────── */
 .product-card {
-  @apply relative flex flex-col bg-white rounded-2xl overflow-hidden ring-1 ring-gray-100 hover:ring-gray-200 hover:shadow-lg transition-all duration-300;
+  @apply relative flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300;
+  border: 1px solid #f1f5f9;
+}
+.product-card:hover {
+  border-color: #d1fae5;
+  transform: translateY(-2px);
 }
 .product-card-image {
-  @apply relative overflow-hidden bg-gray-50 aspect-square;
+  @apply relative overflow-hidden bg-slate-50 aspect-square;
 }
 .product-card-image img {
   @apply w-full h-full object-cover transition-transform duration-500;
 }
 .product-card:hover .product-card-image img {
-  transform: scale(1.05);
+  transform: scale(1.06);
 }
 .product-card-body {
   @apply p-4 flex flex-col gap-1 flex-1;
 }
 .section-title {
-  @apply text-2xl font-bold text-gray-900 tracking-tight;
+  @apply text-2xl font-bold text-slate-900 tracking-tight;
 }
 .section-subtitle {
-  @apply text-sm text-gray-500 mt-1;
+  @apply text-sm text-slate-400 mt-1;
 }
 .badge-promo {
-  @apply absolute z-10 top-3 end-3 bg-violet-600 text-white text-xs font-semibold px-2 py-1 rounded-full;
+  @apply absolute z-10 top-3 end-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm;
 }
 .category-card {
-  @apply flex flex-col items-center gap-3 p-5 bg-white rounded-2xl ring-1 ring-gray-100 hover:ring-violet-200 hover:shadow-md transition-all duration-200 cursor-pointer;
+  @apply flex flex-col items-center gap-3 p-5 bg-white rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 cursor-pointer;
+  border: 1px solid #f1f5f9;
+}
+.category-card:hover {
+  border-color: #a7f3d0;
 }
 .trust-badge {
-  @apply flex items-start gap-4 p-6 rounded-2xl bg-gray-50;
+  @apply flex items-start gap-4 p-6 rounded-2xl bg-white shadow-sm;
+}
+
+/* ── Shop hero ─────────────────────────────────────────────────────── */
+.shop-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #064e3b 50%, #0f172a 100%);
+}
+.shop-hero-blob-1 {
+  position: absolute;
+  top: -8rem;
+  right: -8rem;
+  width: 28rem;
+  height: 28rem;
+  background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(40px);
+}
+.shop-hero-blob-2 {
+  position: absolute;
+  bottom: -8rem;
+  left: -8rem;
+  width: 24rem;
+  height: 24rem;
+  background: radial-gradient(circle, rgba(20,184,166,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(40px);
 }
 @media screen and (min-width: 0) and (min-resolution: +72dpi) {
   span.flatpickr-day {
