@@ -1,6 +1,6 @@
 @props(['product'])
 
-<div class="product-card w-full">
+<div class="product-card group w-full">
   {{-- Image area --}}
   <div class="product-card-image">
     <a href="{{ route('shop.product', $product->slug ?? '#') }}" wire:navigate w.hover class="block w-full h-full">

@@ -795,13 +795,16 @@ span.flatpickr-day.nextMonthDay.selected {
 
 /* ── Marketplace cards ─────────────────────────────────────────────── */
 .product-card {
-  @apply group relative flex flex-col bg-white rounded-2xl overflow-hidden ring-1 ring-gray-100 hover:ring-gray-200 hover:shadow-lg transition-all duration-300;
+  @apply relative flex flex-col bg-white rounded-2xl overflow-hidden ring-1 ring-gray-100 hover:ring-gray-200 hover:shadow-lg transition-all duration-300;
 }
 .product-card-image {
   @apply relative overflow-hidden bg-gray-50 aspect-square;
 }
 .product-card-image img {
-  @apply w-full h-full object-cover transition-transform duration-500 group-hover:scale-105;
+  @apply w-full h-full object-cover transition-transform duration-500;
+}
+.product-card:hover .product-card-image img {
+  transform: scale(1.05);
 }
 .product-card-body {
   @apply p-4 flex flex-col gap-1 flex-1;
