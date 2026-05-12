@@ -61,11 +61,14 @@ class PermissionSeeder extends Seeder
             'create-tables','read-tables','update-tables','delete-tables',
             'create-calendar','read-calendar','update-calendar','delete-calendar',
             'read-orders','delete-orders','delete-attachments',
+            'create-credits','read-credits','update-credits','delete-credits',
         ];
 
         foreach ($permissions as $perm) {
             Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
         }
+
+        Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
 
         $role = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         $role->syncPermissions(Permission::all());
