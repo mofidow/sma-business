@@ -20,7 +20,7 @@ class SaveRepairOrder
         DB::transaction(function () use ($data, &$repairOrder) {
             $taxes = $data['taxes'] ?? [];
             $attachments = $data['attachments'] ?? [];
-            unset($data['attachments'], $data['taxes']);
+            unset($data['attachments'], $data['taxes'], $data['custom_fields']);
 
             $repairOrder->fill($data)->save();
 
