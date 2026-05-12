@@ -8,26 +8,25 @@ import { FormSection } from '@/Components/Jet';
 import { LoadingButton } from '@/Components/Common';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 
-const file = ref(null);
 const { t } = useI18n({});
 const selected = ref(null);
 defineOptions({ layout: AdminLayout });
-const form = useForm({ _method: 'POST', excel: null });
+const form = useForm({ excel: null });
 
 function updateFile(e) {
-  selected.value = e.target.files[0].name;
+  const f = e.target.files[0];
+  if (f) {
+    form.excel = f;
+    selected.value = f.name;
+  }
 }
 
 function submit() {
-  if (file.value) {
-    form.excel = file.value.files[0];
+  if (!form.excel) {
+    form.setError('excel', 'Please select an Excel file before importing.');
+    return;
   }
-
-  // var data = new FormData();
-  // data.append('excel', this.form.excel);
-  // data.append('_method', this.form._method);
-  // this.$inertia.post(route('brands.import.save'), data);
-  form.post(route('brands.import.save'), { preserveScroll: true });
+  form.post(route('brands.import.save'), { forceFormData: true, preserveScroll: true });
 }
 </script>
 
