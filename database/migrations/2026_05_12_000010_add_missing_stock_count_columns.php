@@ -16,34 +16,31 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (! Schema::hasTable('stock_counts')) {
-            return;
+        if (Schema::hasTable('stock_counts')) {
+            Schema::table('stock_counts', function (Blueprint $t) {
+                if (! Schema::hasColumn('stock_counts', 'type')) {
+                    $t->string('type')->default('full')->after('reference');
+                }
+                if (! Schema::hasColumn('stock_counts', 'details')) {
+                    $t->text('details')->nullable()->after('notes');
+                }
+                if (! Schema::hasColumn('stock_counts', 'brands')) {
+                    $t->json('brands')->nullable();
+                }
+                if (! Schema::hasColumn('stock_counts', 'categories')) {
+                    $t->json('categories')->nullable();
+                }
+                if (! Schema::hasColumn('stock_counts', 'file')) {
+                    $t->string('file')->nullable();
+                }
+                if (! Schema::hasColumn('stock_counts', 'completed_at')) {
+                    $t->timestamp('completed_at')->nullable();
+                }
+                if (! Schema::hasColumn('stock_counts', 'adjusted_at')) {
+                    $t->timestamp('adjusted_at')->nullable();
+                }
+            });
         }
-
-        Schema::table('stock_counts', function (Blueprint $t) {
-            if (! Schema::hasColumn('stock_counts', 'type')) {
-                $t->string('type')->default('full')->after('reference');
-            }
-            if (! Schema::hasColumn('stock_counts', 'details')) {
-                $t->text('details')->nullable()->after('notes');
-            }
-            if (! Schema::hasColumn('stock_counts', 'brands')) {
-                $t->json('brands')->nullable();
-            }
-            if (! Schema::hasColumn('stock_counts', 'categories')) {
-                $t->json('categories')->nullable();
-            }
-            if (! Schema::hasColumn('stock_counts', 'file')) {
-                $t->string('file')->nullable();
-            }
-            if (! Schema::hasColumn('stock_counts', 'completed_at')) {
-                $t->timestamp('completed_at')->nullable();
-            }
-            if (! Schema::hasColumn('stock_counts', 'adjusted_at')) {
-                $t->timestamp('adjusted_at')->nullable();
-            }
-        });
-    }
 
         // ── repair_orders ───────────────────────────────────────────────
         if (Schema::hasTable('repair_orders')) {
