@@ -149,8 +149,11 @@ class CreditController extends Controller
             $amount = (float) $request->amount;
             $date   = $request->date ?? now()->toDateString();
 
-            // Create a payment record on the sale (using existing payment system)
-            $payment = Payment::create([
+            // PaymentObserver::saved() fires on create and handles:
+            //   - attaching payment to sale via payables pivot
+            //   - incrementing sale.paid
+            //   - decrementing customer balance
+            Payment::create([
                 'reference'    => 'CRD-' . $installment->id . '-' . now()->format('YmdHis'),
                 'date'         => $date,
                 'amount'       => $amount,
@@ -163,9 +166,6 @@ class CreditController extends Controller
                 'user_id'      => auth()->id(),
             ]);
 
-            // Attach to sale via polymorphic pivot
-            $sale->payments()->attach($payment->id, ['amount' => $amount]);
-
             // Mark installment paid
             $installment->update([
                 'paid_amount' => $amount,
@@ -173,9 +173,6 @@ class CreditController extends Controller
                 'status'      => 'paid',
                 'notes'       => $request->notes,
             ]);
-
-            // Update sale paid column
-            $sale->increment('paid', $amount);
 
             $this->recalculateCreditStatus($sale->fresh());
         });

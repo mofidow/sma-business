@@ -1,26 +1,16 @@
 <script setup>
-import { router, usePage } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
-import { ref } from 'vue';
 
-import { AutoComplete, Button, Loading, Pagination } from '@/Components/Common';
-import { Dropdown, Modal } from '@/Components/Jet';
+import { AutoComplete, Loading, Pagination } from '@/Components/Common';
+import { Dropdown } from '@/Components/Jet';
 import { PageSearch } from '@/Core/PageSearch';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import ConvertForm from './ConvertForm.vue';
 
 defineOptions({ layout: AdminLayout });
 defineProps(['pagination', 'stores', 'users']);
 
-const converting = ref(false);
-const current = ref(null);
-const showConvert = ref(false);
 const { filters, searching, searchNow } = PageSearch();
-
-function openConvert(sale) {
-  current.value = sale;
-  showConvert.value = true;
-}
 
 function viewCredit(sale) {
   router.visit(route('credits.show', { credit: sale.id }));
@@ -51,6 +41,8 @@ function agingDays(sale) {
     {{ $t('Credit (Deyn)') }}
     <template #subheading>{{ $t('Sales with deferred payment plans') }}</template>
     <template #menu>
+      <div class="flex items-center gap-2">
+      <Link :href="route('sales.index')" class="btn-primary">+ {{ $t('Convert a Sale') }}</Link>
       <Dropdown align="right" width="56" :auto-close="false">
         <template #trigger>
           <button class="-m-2 flex items-center rounded-md p-2.5 transition duration-150 ease-in-out">
@@ -86,6 +78,7 @@ function agingDays(sale) {
           </div>
         </template>
       </Dropdown>
+      </div>
     </template>
   </Header>
 
@@ -139,7 +132,10 @@ function agingDays(sale) {
             </td>
           </tr>
           <tr v-if="!pagination.data.length">
-            <td colspan="9" class="px-4 py-8 text-center text-gray-400">{{ $t('No records found') }}</td>
+            <td colspan="9" class="px-4 py-8 text-center text-gray-400">
+              {{ $t('No credit sales yet.') }}
+              <Link :href="route('sales.index')" class="ms-1 link">{{ $t('Go to Sales to convert a sale to Credit (Deyn).') }}</Link>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -148,8 +144,4 @@ function agingDays(sale) {
     <Pagination :pagination="pagination" class="mt-4" />
   </div>
 
-  <!-- Convert to Credit Modal -->
-  <Modal :show="showConvert" max-width="lg" @close="showConvert = false">
-    <ConvertForm v-if="current" :sale="current" @close="showConvert = false" />
-  </Modal>
 </template>
