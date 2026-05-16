@@ -85,7 +85,8 @@ class SavePurchase
         $purchase->refresh()->loadMissing([
             'store', 'supplier', 'items.product', 'items.variations',
         ]);
-        event(new PurchaseEvent($purchase, $oldPurchase));
+
+        defer(fn () => event(new PurchaseEvent($purchase, $oldPurchase)));
 
         return $purchase;
     }

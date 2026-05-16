@@ -80,6 +80,7 @@ const addItem = async p => {
         :rounded="rounded"
         :keyboard="type == 'pos'"
         @focus="openSearch = true"
+        @keydown.enter.prevent
         :placeholder="$t('Scan barcode or type to search')"
       />
       <Link

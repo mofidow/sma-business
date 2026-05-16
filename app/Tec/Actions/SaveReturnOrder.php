@@ -82,11 +82,14 @@ class SaveReturnOrder
         $return_order->refresh()->loadMissing([
             'store', 'customer', 'supplier', 'items.product', 'items.variations',
         ]);
-        event(new ReturnOrderEvent($return_order, $oldReturnOrder));
 
-        if ($return_order->type == 'Sale') {
-            FiscalServiceJob::dispatchNewReturnSale($return_order);
-        }
+        defer(function () use ($return_order, $oldReturnOrder) {
+            event(new ReturnOrderEvent($return_order, $oldReturnOrder));
+
+            if ($return_order->type == 'Sale') {
+                FiscalServiceJob::dispatchNewReturnSale($return_order);
+            }
+        });
 
         return $return_order;
     }

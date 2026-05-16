@@ -103,13 +103,18 @@ class SaveSale
         $sale->refresh()->loadMissing([
             'store', 'customer', 'items.product', 'items.variations',
         ]);
-        event(new SaleEvent($sale, $oldSale));
 
-        if ($oldSale) {
-            FiscalServiceJob::dispatchSaleUpdate($sale, $oldSale);
-        } else {
-            FiscalServiceJob::dispatchNewSale($sale);
-        }
+        // Defer stock sync, cost allocation, and fiscal reporting to after HTTP response
+        // so the browser gets a fast redirect instead of waiting for all post-save processing.
+        defer(function () use ($sale, $oldSale) {
+            event(new SaleEvent($sale, $oldSale));
+
+            if ($oldSale) {
+                FiscalServiceJob::dispatchSaleUpdate($sale, $oldSale);
+            } else {
+                FiscalServiceJob::dispatchNewSale($sale);
+            }
+        });
 
         return $sale;
     }
