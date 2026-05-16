@@ -82,7 +82,7 @@ function agingDays(sale) {
     </template>
   </Header>
 
-  <Loading :searching="searching" />
+  <Loading v-if="searching" />
 
   <div class="p-4 sm:p-6">
     <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
