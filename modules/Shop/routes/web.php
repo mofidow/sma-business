@@ -12,6 +12,7 @@ Route::group(['prefix' => '', 'as' => 'shop.', 'middleware' => ['shopmode']], fu
 
     Route::get('products', Livewire\Products::class)->name('products');
     Route::get('products/{slug}', Livewire\Product::class)->name('product');
+    Route::get('buy/{slug}', Livewire\QuickOrder::class)->name('quick-order');
 
     Route::get('brands', Livewire\Brands::class)->name('brands');
     Route::get('categories', Livewire\Categories::class)->name('categories');

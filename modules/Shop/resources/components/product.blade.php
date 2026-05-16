@@ -1,9 +1,9 @@
 @props(['product'])
 
 <div class="product-card group w-full">
-  {{-- Image area --}}
+  {{-- Image area — links to quick-order --}}
   <div class="product-card-image">
-    <a href="{{ route('shop.product', $product->slug ?? '#') }}" wire:navigate w.hover class="block w-full h-full">
+    <a href="{{ route('shop.quick-order', $product->slug ?? '#') }}" class="block w-full h-full">
       <img src="{{ $product->photo ?? asset('img/products/dummy.jpg') }}"
            alt="{{ $product->name }}"
            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
@@ -26,14 +26,11 @@
       </div>
     @endif
 
-    {{-- Wishlist button (visible on hover) --}}
-    <div class="absolute top-3 start-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-      <a href="{{ route('shop.wishlist') }}" wire:navigate w.hover
-         class="flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-md hover:bg-emerald-50 text-gray-400 hover:text-emerald-600 transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-        </svg>
-      </a>
+    {{-- Quick-order overlay on hover --}}
+    <div class="absolute inset-0 bg-emerald-600/0 group-hover:bg-emerald-600/10 flex items-center justify-center transition-colors duration-300">
+      <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white text-emerald-700 font-bold text-xs px-3 py-1.5 rounded-full shadow-md">
+        {{ __('Order Now') }} →
+      </span>
     </div>
   </div>
 
@@ -54,9 +51,9 @@
       @endif
     </div>
 
-    {{-- Product name --}}
+    {{-- Product name → quick-order --}}
     <h3 class="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 flex-1">
-      <a href="{{ route('shop.product', $product->slug ?? '#') }}" wire:navigate w.hover class="hover:text-emerald-600 transition-colors">
+      <a href="{{ route('shop.quick-order', $product->slug ?? '#') }}" class="hover:text-emerald-600 transition-colors">
         {{ $product->name }}
       </a>
     </h3>
@@ -65,19 +62,16 @@
     <div class="flex items-center justify-between mt-1">
       <span class="text-base font-bold text-gray-900">{{ currency_value($product->price) }}</span>
       @if ($product->validPromotions->count())
-        <span class="text-xs text-amber-700 font-bold bg-amber-100 px-2 py-0.5 rounded-full">On sale</span>
+        <span class="text-xs text-amber-700 font-bold bg-amber-100 px-2 py-0.5 rounded-full">{{ __('On sale') }}</span>
       @endif
     </div>
 
-    {{-- Add to cart --}}
+    {{-- Buy Now button --}}
     <div class="mt-2">
-      @if (($shop_settings ?? null) && ($shop_settings['general']['cart_button'] ?? null) == 'hover')
-        <div key="add_to_cart" class="xl:hidden xl:group-hover:block animate__faster animate__animated animate__fadeIn">
-          <livewire:components.cart.add :product="$product" :popup_variant="true" :key="'to_cart_' . $product->id" />
-        </div>
-      @else
-        <livewire:components.cart.add :product="$product" :popup_variant="true" :key="'add_to_cart_' . $product->id" />
-      @endif
+      <a href="{{ route('shop.quick-order', $product->slug ?? '#') }}"
+         class="block w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 rounded-lg transition-colors">
+        {{ __('Buy Now') }}
+      </a>
     </div>
   </div>
 </div>

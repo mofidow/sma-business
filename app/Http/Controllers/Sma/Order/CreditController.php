@@ -40,13 +40,15 @@ class CreditController extends Controller
 
     /**
      * Convert an existing sale to a credit sale with installment plan.
+     * Route: POST /credits/{sale}/convert  → credits.convert
+     * NOTE: uses {sale} not {credit} — parameter name matches.
      */
     public function store(Request $request, Sale $sale)
     {
         $request->validate([
             'installments'              => 'required|array|min:1',
             'installments.*.amount'     => 'required|numeric|min:0.01',
-            'installments.*.due_date'   => 'required|date|after_or_equal:today',
+            'installments.*.due_date'   => 'required|date',
         ]);
 
         DB::transaction(function () use ($request, $sale) {
@@ -55,7 +57,6 @@ class CreditController extends Controller
                 'credit_status' => 'pending',
             ]);
 
-            // Remove any previously created installments
             $sale->creditInstallments()->delete();
 
             foreach ($request->installments as $row) {
@@ -78,12 +79,14 @@ class CreditController extends Controller
 
     /**
      * Show a single credit sale with its installment timeline.
+     * Route: GET /credits/{credit}  → credits.show
+     * Parameter name MUST be $credit to match route placeholder {credit}.
      */
-    public function show(Sale $sale)
+    public function show(Sale $credit)
     {
-        abort_unless($sale->is_credit, 404);
+        abort_unless($credit->is_credit, 404);
 
-        $sale->load([
+        $credit->load([
             'customer:id,name,company,phone,email',
             'store:id,name',
             'user:id,name',
@@ -92,15 +95,16 @@ class CreditController extends Controller
             'creditInstallments' => fn ($q) => $q->orderBy('due_date'),
         ]);
 
-        return Inertia::render('Sma/Order/Credit/View', ['sale' => $sale]);
+        return Inertia::render('Sma/Order/Credit/View', ['sale' => $credit]);
     }
 
     /**
      * Update installment schedule for a credit sale.
+     * Route: PUT /credits/{credit}  → credits.update
      */
-    public function update(Request $request, Sale $sale)
+    public function update(Request $request, Sale $credit)
     {
-        abort_unless($sale->is_credit, 404);
+        abort_unless($credit->is_credit, 404);
 
         $request->validate([
             'installments'              => 'required|array|min:1',
@@ -108,14 +112,13 @@ class CreditController extends Controller
             'installments.*.due_date'   => 'required|date',
         ]);
 
-        DB::transaction(function () use ($request, $sale) {
-            // Only delete unpaid installments
-            $sale->creditInstallments()->where('status', '!=', 'paid')->delete();
+        DB::transaction(function () use ($request, $credit) {
+            $credit->creditInstallments()->where('status', '!=', 'paid')->delete();
 
             foreach ($request->installments as $row) {
-                $sale->creditInstallments()->create([
-                    'customer_id' => $sale->customer_id,
-                    'store_id'    => $sale->store_id,
+                $credit->creditInstallments()->create([
+                    'customer_id' => $credit->customer_id,
+                    'store_id'    => $credit->store_id,
                     'user_id'     => auth()->id(),
                     'amount'      => $row['amount'],
                     'due_date'    => $row['due_date'],
@@ -124,7 +127,7 @@ class CreditController extends Controller
                 ]);
             }
 
-            $this->recalculateCreditStatus($sale);
+            $this->recalculateCreditStatus($credit);
         });
 
         return back()->with('message', __('Credit installment schedule updated.'));
@@ -132,6 +135,7 @@ class CreditController extends Controller
 
     /**
      * Record a payment against a specific installment.
+     * Route: POST /credits/{sale}/pay/{installment}  → credits.pay
      */
     public function recordPayment(Request $request, Sale $sale, CreditInstallment $installment)
     {
@@ -149,10 +153,7 @@ class CreditController extends Controller
             $amount = (float) $request->amount;
             $date   = $request->date ?? now()->toDateString();
 
-            // PaymentObserver::saved() fires on create and handles:
-            //   - attaching payment to sale via payables pivot
-            //   - incrementing sale.paid
-            //   - decrementing customer balance
+            // PaymentObserver::saved() handles attach + sale.paid increment
             Payment::create([
                 'reference'    => 'CRD-' . $installment->id . '-' . now()->format('YmdHis'),
                 'date'         => $date,
@@ -166,7 +167,6 @@ class CreditController extends Controller
                 'user_id'      => auth()->id(),
             ]);
 
-            // Mark installment paid
             $installment->update([
                 'paid_amount' => $amount,
                 'paid_date'   => $date,
@@ -181,40 +181,44 @@ class CreditController extends Controller
     }
 
     /**
-     * Soft-delete a credit sale (removes credit flag too).
+     * Soft-delete a credit sale.
+     * Route: DELETE /credits/{credit}  → credits.destroy
      */
-    public function destroy(Sale $sale)
+    public function destroy(Sale $credit)
     {
-        abort_unless($sale->is_credit, 404);
+        abort_unless($credit->is_credit, 404);
 
-        if ($sale->delete()) {
+        if ($credit->delete()) {
             return to_route('credits.index')->with('message', __('Credit sale has been deleted.'));
         }
 
         return back()->with('error', __('The record can not be deleted.'));
     }
 
-    public function restore(Sale $sale)
+    /**
+     * Route: PUT /credits/{credit}/restore  → credits.restore
+     */
+    public function restore(Sale $credit)
     {
-        $sale->restore();
+        $credit->restore();
 
         return back()->with('message', __('Credit sale has been restored.'));
     }
 
-    public function destroyPermanently(Sale $sale)
+    /**
+     * Route: DELETE /credits/{credit}/permanently  → credits.destroy.permanently
+     */
+    public function destroyPermanently(Sale $credit)
     {
-        abort_unless($sale->is_credit, 404);
+        abort_unless($credit->is_credit, 404);
 
-        if ($sale->forceDelete()) {
+        if ($credit->forceDelete()) {
             return to_route('credits.index')->with('message', __('Credit sale has been permanently deleted.'));
         }
 
         return back()->with('error', __('The record can not be deleted.'));
     }
 
-    /**
-     * Recalculate and persist the credit_status on the sale.
-     */
     private function recalculateCreditStatus(Sale $sale): void
     {
         $installments = $sale->creditInstallments()->withTrashed(false)->get();

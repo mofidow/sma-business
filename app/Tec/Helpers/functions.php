@@ -9,26 +9,49 @@ use App\Models\Sma\Setting\CustomField;
 if (! function_exists('get_settings')) {
     function get_settings($keys = null)
     {
+        // Request-level cache: load all settings once per request then serve from memory
+        static $allSettingsCache = null;
+
         $json = json_settings_fields();
+
+        if ($allSettingsCache === null) {
+            $allSettingsCache = Setting::all()->pluck('tec_value', 'tec_key')->all();
+        }
+
+        $decoded = fn ($key, $value) => in_array($key, $json) ? json_decode($value, true) : $value;
+
         if (! empty($keys)) {
             $single = ! is_array($keys) || count($keys) == 1;
 
             if ($single) {
-                $key = is_array($keys) ? $keys[0] : $keys;
-                $value = optional(Setting::where('tec_key', $key)->first())->tec_value;
+                $key   = is_array($keys) ? $keys[0] : $keys;
+                $value = $allSettingsCache[$key] ?? null;
 
-                return in_array($key, $json) ? json_decode($value, true) : $value;
+                return $decoded($key, $value);
             }
 
-            return Setting::whereIn('tec_key', $keys)->get()->mapWithKeys(function ($row) use ($json) {
-                return [$row['tec_key'] => in_array($row['tec_key'], $json) ? json_decode($row['tec_value'], true) : $row['tec_value']];
-            })->all();
+            $result = [];
+            foreach ($keys as $key) {
+                $result[$key] = $decoded($key, $allSettingsCache[$key] ?? null);
+            }
+
+            return $result;
         }
 
-        return Setting::all()->pluck('tec_value', 'tec_key')
-            ->merge(['baseUrl' => url('/')])->transform(function ($value, $key) use ($json) {
-                return in_array($key, $json) ? json_decode($value, true) : $value;
-            })->all();
+        $out = collect($allSettingsCache)->merge(['baseUrl' => url('/')]);
+
+        return $out->transform(function ($value, $key) use ($decoded) {
+            return $decoded($key, $value);
+        })->all();
+    }
+}
+
+if (! function_exists('settings_clear_cache')) {
+    function settings_clear_cache(): void
+    {
+        // Force re-load on the next get_settings() call within this request
+        // (useful after settings are saved mid-request in tests)
+        $GLOBALS['__settings_cache_busted'] = true;
     }
 }
 

@@ -62,6 +62,12 @@ class Store extends Model
         return $this->belongsToMany(User::class);
     }
 
+    protected static function booted(): void
+    {
+        static::saved(fn () => cache()->forget('active_stores'));
+        static::deleted(fn () => cache()->forget('active_stores'));
+    }
+
     public function scopeActive($query)
     {
         $query->where('active', 1);

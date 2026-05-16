@@ -68,8 +68,10 @@ Route::middleware([
 
     // Order routes require store middleware
     Route::middleware('store')->group(function () {
+        // Credits: exclude create/store — conversion uses credits.convert instead
+        Route::extendedResource('credits', Sma\Order\CreditController::class, ['except' => ['create', 'store']]);
+
         Route::extendedResources([
-            'credits'       => Sma\Order\CreditController::class,
             'sales'         => Sma\Order\SaleController::class,
             'expenses'      => Sma\Order\ExpenseController::class,
             'incomes'       => Sma\Order\IncomeController::class,

@@ -81,6 +81,12 @@ function addReturnRow(row) {
   router.visit(route('return_orders.create', { sale_id: row.id }));
 }
 
+function extractRegion(notes) {
+  if (!notes) return '';
+  const match = notes.match(/Region:\s*([^|]+)/);
+  return match ? match[1].trim() : '';
+}
+
 function emailRow(row) {
   router.post(route('email.sale', { sale: row.id }));
 }
@@ -190,6 +196,9 @@ function deleteRow(row) {
                       :name="filters.sort == 'customer.company:desc' ? 'c-up' : 'c-down'"
                     />
                   </button>
+                </th>
+                <th scope="col" class="text-focus px-3 py-3.5 text-start text-sm font-semibold">
+                  {{ $t('Region') }}
                 </th>
                 <th scope="col" class="text-focus px-3 py-3.5 text-center text-sm font-semibold">
                   {{ $t('Items') }}
@@ -324,6 +333,13 @@ function deleteRow(row) {
                   <td @click="viewRow(row)" class="cursor-pointer px-3 py-4 text-sm whitespace-nowrap">{{ row.reference }}</td>
                   <td @click="viewRow(row)" class="cursor-pointer px-3 py-4 text-sm whitespace-nowrap">
                     {{ row.customer.company || row.customer.name }}
+                  </td>
+                  <td @click="viewRow(row)" class="cursor-pointer px-3 py-4 text-sm whitespace-nowrap">
+                    <span v-if="extractRegion(row.notes)"
+                      class="inline-block bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs font-medium px-2 py-0.5 rounded-full">
+                      {{ extractRegion(row.notes) }}
+                    </span>
+                    <span v-else class="text-gray-300">—</span>
                   </td>
                   <td @click="viewRow(row)" class="cursor-pointer px-3 py-4 text-center text-sm whitespace-nowrap">
                     {{ row.total_items }} ({{ $number_qty(row.total_quantity) }})

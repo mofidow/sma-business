@@ -61,7 +61,7 @@ class HandleInertiaRequests extends Middleware
         }
 
         if (! $available_stores) {
-            $available_stores = Store::active()->get(['id', 'name']);
+            $available_stores = cache()->remember('active_stores', 300, fn () => Store::active()->get(['id', 'name']));
 
             // Auto-select when only one store exists and none is selected
             if (! session('selected_store_id') && $available_stores->count() === 1) {
